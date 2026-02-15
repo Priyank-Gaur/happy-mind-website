@@ -197,24 +197,16 @@ export default {
   				'Noto Color Emoji'
   			],
   			serif: [
-  				'Cormorant Garamond',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
+  				'Nunito',
+  				'ui-sans-serif',
+  				'system-ui',
+  				'sans-serif'
   			],
   			mono: [
-  				'IBM Plex Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
+  				'Nunito',
+  				'ui-sans-serif',
+  				'system-ui',
+  				'sans-serif'
   			]
   		}
   	}

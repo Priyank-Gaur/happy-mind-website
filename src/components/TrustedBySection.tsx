@@ -7,13 +7,13 @@ import bigFMLogo from "@/assets/brand_logo/BigFM.jpg";
 import cityFloLogo from "@/assets/brand_logo/city-flo.png";
 import centralParkLogo from "@/assets/brand_logo/CentralPark.jpg";
 import chintelsLogo from "@/assets/brand_logo/Chintels.jpg";
-import ekartLogo from "@/assets/brand_logo/EKART.jpeg";
-import flipkartLogo from "@/assets/brand_logo/Flipkart.jpeg";
+import ekartLogo from "@/assets/brand_logo/EKART.png";
+import flipkartLogo from "@/assets/brand_logo/Flipkart.png";
 import googleLogo from "@/assets/brand_logo/Google.webp";
 import m3mLogo from "@/assets/brand_logo/M3M.png";
 import mmtcPampLogo from "@/assets/brand_logo/mmtc-pamp.jpg";
-import nuvocoLogo from "@/assets/brand_logo/Nuvoco.jpeg";
-import signatureGlobalLogo from "@/assets/brand_logo/SignatureGlobal.webp";
+import nuvocoLogo from "@/assets/brand_logo/Nuvoco.png";
+import signatureGlobalLogo from "@/assets/brand_logo/signatures-global.webp";
 
 const partnerLogos = [
   { name: "Google", category: "Technology", logo: googleLogo },

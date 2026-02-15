@@ -10,6 +10,7 @@ import SocialsSection from "@/components/SocialsSection";
 import TrustSection from "@/components/TrustSection";
 import FinalInvitationSection from "@/components/FinalInvitationSection";
 import Footer from "@/components/Footer";
+import FactStats from "@/components/FactStats";
 
 const Index = () => {
   return (
@@ -21,6 +22,9 @@ const Index = () => {
         </div>
         <div className="bg-muted/30">
           <HeroSection />
+        </div>
+        <div className="bg-background">
+          <FactStats />
         </div>
         <div className="bg-background">
           <WhatSpaceSection />

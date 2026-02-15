@@ -16,9 +16,31 @@ const trustPills = [{
 
 const HeroSection = () => {
   return (
-    <section className="min-h-[100vh] sm:min-h-[60vh] flex items-center py-8 px-4 sm:px-6 lg:px-16 overflow-x-hidden">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-16">
-        {/* Trust Pills - Full width above content */}
+    <section className="min-h-[110vh] relative overflow-hidden">
+      
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img 
+          src={whatSpaceHero} 
+          alt="" 
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Gradient overlay for readability */}
+      <div className="absolute inset-0 z-10 pointer-events-none" style={{
+        background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 35%, hsl(var(--background) / 0.7) 55%, transparent 75%)"
+      }} />
+      {/* Top/bottom fade */}
+      <div className="absolute inset-0 z-10 pointer-events-none" style={{
+        background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 15%, transparent 85%, hsl(var(--background)) 100%)"
+      }} />
+
+      {/* Content */}
+      <div className="relative z-20 min-h-[110vh] flex items-center py-8 px-6 lg:px-16">
+        <div className="container mx-auto max-w-3xl lg:mr-auto lg:ml-16">
+          <div className="space-y-8 text-center lg:text-left">
+            {/* Trust Pills - Full width above content */}
         <div className="flex flex-wrap gap-2 sm:gap-4 justify-center mb-8 sm:mb-12">
           {trustPills.map((pill, index) => (
             <div key={index} className="flex items-center gap-2 bg-white border border-border/30 rounded-md px-3 py-2 sm:px-5 sm:py-2.5 shadow-md flex-shrink-0">
@@ -31,51 +53,41 @@ const HeroSection = () => {
             </div>
           ))}
         </div>
-        
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div className="space-y-4 text-center lg:text-left">
+
             {/* Micro-intro */}
-            <p className="font-sans text-sm sm:text-base text-muted-foreground tracking-wide">
+            <p className="font-sans text-base text-muted-foreground tracking-wide">
               Welcome to
             </p>
             
             {/* H1 */}
-            <h1 className="font-sans text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-muted-foreground break-words">
-              A <span className="text-primary">Conscious Growth<br className="sm:hidden" /> Ecosystem</span> Where
+            <h1 className="font-sans text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-muted-foreground">
+              A <span className="text-primary">Conscious Growth Ecosystem</span> Where
             </h1>
             
             {/* H2 - Hero Statement */}
-            <h2 className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-medium leading-relaxed text-black break-words">
-              <span className="text-primary">Human Science & Psychology powered</span> technology engages individuals & organisations to become more{" "}
+            <h2 className="font-serif text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-foreground">
+              <span className="text-primary">Human Science & Psychology powered</span> technology engages individuals & organisations to become more {" "}
               <span className="text-primary">aware, capable, and connected.</span>
             </h2>
             
-
+            {/* H3 - Support Line */}
+            <p style={{
+            fontFamily: "'IBM Plex Sans', sans-serif"
+          }} className="text-sm md:text-base font-medium tracking-wide font-mono text-muted-foreground">
+              Psychology-powered. Human-led.
+            </p>
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
               <Link to="/for-individuals">
-              <Button variant="default" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+              <Button variant="default" size="lg" className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300">
                 Start for Myself
-              </Button>
-              </Link>
+              </Button></Link>
               <Link to="/for-organisations">
-              <Button variant="outline" size="lg" className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="rounded-full px-8 py-6 text-base font-medium border-2 border-primary text-primary bg-background/80 backdrop-blur-sm hover:bg-primary/5 transition-all duration-300">
                 Explore for My Team
-              </Button>
-              </Link>
+              </Button></Link>
             </div>
-          </div>
-
-          {/* Right Side - Image */}
-          <div className="flex items-center justify-center">
-            <img 
-              src={whatSpaceHero} 
-              alt="People growing together in a conscious space" 
-              className="w-full max-w-[280px] sm:max-w-lg lg:max-w-xl h-auto object-contain rounded-2xl shadow-lg" 
-            />
           </div>
         </div>
       </div>

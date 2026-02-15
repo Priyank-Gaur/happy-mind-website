@@ -41,11 +41,11 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
+            <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Log In
-            </Button>
-            <Button variant="default" size="sm" className="rounded-full px-6">
-              Get Started
+            </a>
+            <Button asChild variant="default" size="sm" className="rounded-full px-6">
+              <a href="https://happimynd.com/signup">Get Started</a>
             </Button>
           </div>
 
@@ -80,11 +80,11 @@ const Navbar = () => {
               Vibe with Us
             </a>
             <div className="flex gap-4 pt-4">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                 Log In
-              </Button>
-              <Button variant="default" size="sm" className="rounded-full px-6">
-                Get Started
+              </a>
+              <Button asChild variant="default" size="sm" className="rounded-full px-6">
+                <a href="https://happimynd.com/signup">Get Started</a>
               </Button>
             </div>
           </div>

@@ -20,7 +20,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Services</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
-              <li><a href="" className="hover:text-primary transition-colors">HappiLIFE</a></li>
+              <li><a href="https://happimynd.com/signup" className="hover:text-primary transition-colors">HappiLIFE</a></li>
               <li><a href="" className="hover:text-primary transition-colors">HappiGUIDE</a></li>
               <li><a href="" className="hover:text-primary transition-colors">HappiBUDDY</a></li>
               <li><a href="" className="hover:text-primary transition-colors">HappiSELF</a></li>

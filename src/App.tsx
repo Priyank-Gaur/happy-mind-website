@@ -10,6 +10,7 @@ import ForOrganisations from "./pages/ForOrganisations";
 import Solv from "./pages/Solv";
 import About from "./pages/About";
 import FloatingContactButton from "./components/FloatingContactButton";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
       <Sonner />
       <FloatingContactButton />
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/for-individuals" element={<ForIndividuals />} />
