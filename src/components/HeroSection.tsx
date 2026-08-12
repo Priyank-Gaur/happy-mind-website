@@ -11,7 +11,7 @@ const trustPills = [{
   text: "200K+ Users Trust Us"
 }, {
   icon: Star,
-  text: "5000+ counselling hours"
+  text: "5000+ Counselling Hours"
 }];
 
 const HeroSection = () => {
@@ -55,7 +55,7 @@ const HeroSection = () => {
         </div>
 
             {/* Micro-intro */}
-            <p className="font-sans text-base text-muted-foreground tracking-wide">
+            <p className="font-sans text-xl text-muted-foreground tracking-wide">
               Welcome to
             </p>
             

@@ -28,7 +28,15 @@ const SolvCommunity = () => {
           <p className="text-muted-foreground text-lg leading-relaxed">
             You don't grow alone. Be part of conversations, learning, and shared journeys that make conscious growth easier and more human.
           </p>
-          <Button size="lg" variant="outline" className="rounded-full px-10 mt-4">
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="rounded-full px-10 mt-4"
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent('open-contact-form'));
+            }}
+          >
             Explore the community
           </Button>
         </div>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import organizationHero from "@/assets/organization-hero.png";
+import organizationHero from "@/assets/AboutpageHERO.png";
 
 const AboutHeroSection = () => {
   return (
@@ -9,14 +9,14 @@ const AboutHeroSection = () => {
           {/* Left Content */}
           <div className="space-y-6">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              We're a People First Company in a Tech First World
+              We're a <span className="text-primary">People First Company</span> in a Tech First World
             </h1>
             
-            <h2 className="font-sans text-xl md:text-2xl text-muted-foreground leading-relaxed">
+            <h2 className="font-sans text-2xl md:text-3xl text-muted-foreground leading-relaxed">
               HappiMynd brings human science of psychology and technology together to build clarity, capability, and connection at scale.
             </h2>
             
-            <h3 className="font-serif text-lg text-primary italic">
+            <h3 className="font-serif text-2xl text-primary italic">
               Growth that feels natural. Impact that lasts.
             </h3>
             

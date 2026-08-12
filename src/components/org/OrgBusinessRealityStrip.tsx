@@ -31,18 +31,18 @@ const OrgBusinessRealityStrip = () => {
           {/* Left Content */}
           <div className="space-y-6">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground leading-tight">
-              The performance risks leaders are managing — often without the right lens
+              The Performance Risks Leaders Are Managing — Often Without the Right Lens
             </h2>
 
-            <h3 className="font-serif text-xl md:text-2xl font-semibold text-foreground">
+            <h3 className="text-primary font-serif text-xl md:text-2xl font-semibold text-foreground">
               Great Strategy. Great Technology. Great Team.
             </h3>
 
-            <p className="font-sans text-lg text-muted-foreground">
+            <p className="font-sans text-xl text-muted-foreground">
               So what's holding performance back?
             </p>
 
-            <p className="font-sans text-base text-muted-foreground leading-relaxed">
+            <p className="font-sans text-xl text-muted-foreground leading-relaxed">
               Those unexpected delivery gaps, leadership strain and talent erosion along the execution journey.
             </p>
 

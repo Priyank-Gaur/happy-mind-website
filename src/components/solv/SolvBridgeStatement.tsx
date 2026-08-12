@@ -15,7 +15,7 @@ const SolvBridgeStatement = () => {
 
   return (
     <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-card">
-      <div className="container mx-auto max-w-3xl text-center">
+      <div className="container mx-auto max-w-4xl text-center">
         <div
           className={`space-y-8 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"

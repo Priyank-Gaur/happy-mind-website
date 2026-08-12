@@ -2,7 +2,7 @@ import { TrendingUp, BarChart3, Flame, Heart } from "lucide-react";
 
 const stats = [
   { icon: TrendingUp, value: "89%", label: "employee adoption" },
-  { icon: BarChart3, value: "3.2×", label: "ROI on wellness investment" },
+  { icon: BarChart3, value: "3.2X", label: "ROI on wellness investment" },
   { icon: Flame, value: "34%", label: "reduction in burnout indicators" },
   { icon: Heart, value: "28%", label: "improvement in engagement scores" },
 ];

@@ -58,8 +58,8 @@ const OrgHowWeWork = () => {
 
         {/* C.O.R.E. Framework */}
         <div className="mb-16">
-          <h3 className="font-serif text-2xl font-semibold text-foreground text-center mb-10">
-            The C.O.R.E.
+          <h3 className="font-serif text-4xl font-bold text-foreground text-center mb-10">
+            <span className="text-primary">The C.O.R.E.</span>
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coreFramework.map((item, index) => (

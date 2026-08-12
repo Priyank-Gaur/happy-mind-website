@@ -2,24 +2,24 @@ import { Eye, Rocket, Users, Shield, Sparkles, Heart } from "lucide-react";
 
 const values = [
   {
-    icon: Users,
-    title: "People-Centric",
-    description: "Every solution starts with understanding human behaviour and needs.",
+    icon: Heart,
+    title: "Empathy",
+    description: "We design experiences by deeply understanding emotional, behavioural, and contextual realities. Every solution is shaped around how individuals truly think, feel, and function.",
   },
   {
     icon: Shield,
-    title: "Trust & Privacy",
-    description: "Confidentiality and ethical practice are non-negotiable foundations.",
+    title: "Evidence-Driven",
+    description: "Our tools, frameworks, and decisions are grounded in behavioural research and validated psychological methods. We prioritise measurable impact over assumptions or trends.",
   },
   {
     icon: Sparkles,
-    title: "Conscious Growth",
-    description: "We believe in growth that is intentional, sustainable, and meaningful.",
+    title: "Integrity",
+    description: "We uphold ethical practice, data responsibility, and psychological safety in everything we build.Trust, transparency, and user well-being guide our actions at every level.",
   },
   {
-    icon: Heart,
-    title: "Accessible Impact",
-    description: "Psychological support should be available to everyone, everywhere.",
+    icon: Users,
+    title: "Inclusivity",
+    description: "We create systems that are accessible across backgrounds, identities, and lived experiences.Growth and support should not be limited by context, circumstance, or difference.",
   },
 ];
 
@@ -29,8 +29,8 @@ const AboutMissionVisionSection = () => {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Our Mission, Vision & Values
+          <h2 className="text-primary font-serif text-3xl md:text-4xl font-bold text-foreground">
+            Our Vision, Mission & Values
           </h2>
         </div>
 
@@ -58,7 +58,7 @@ const AboutMissionVisionSection = () => {
               <h3 className="font-serif text-2xl font-bold text-foreground">Mission</h3>
             </div>
             <p className="text-foreground/80 leading-relaxed text-lg">
-              To empower people and organisations through psychology and technology, enabling conscious growth that unlocks people potential, improves performance, and redefines happiness in a people-centric world.
+To advance conscious growth at scale by integrating psychology, research and technology that helps individuals and organisations flourish— impacting 2 million lives by 2030.
             </p>
           </div>
         </div>

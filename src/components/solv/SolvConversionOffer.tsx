@@ -49,7 +49,7 @@ const SolvConversionOffer = () => {
 
           <div className="space-y-4 mb-10">
             <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
-            <Button size="lg" className="rounded-full px-12 text-lg h-14">
+            <Button size="lg" className="rounded-full px-5 text-md h-14">
               Begin Your Conscious Growth
             </Button>
             </Link>

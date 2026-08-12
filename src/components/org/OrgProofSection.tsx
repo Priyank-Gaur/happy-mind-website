@@ -4,22 +4,22 @@ const proofStats = [
   {
     icon: Users,
     value: "2L+",
-    label: "individuals engaged across environments",
+    label: "Individuals engaged across environments",
   },
   {
     icon: Building,
     value: "40+",
-    label: "institutional clients across BFSI, IT, media, real estate, energy",
+    label: "Institutional Clients Across BFSI, IT, Media, Real Estate, Energy",
   },
   {
     icon: Award,
     value: "Industry First",
-    label: "programs for PWD employees & D.E.I. interventions",
+    label: "Programs for PWD Employees & D.E.I. Interventions",
   },
   {
     icon: TrendingUp,
     value: "35%+",
-    label: "engagement in corporate emotional support programmes",
+    label: "Engagement in Corporate Emotional Support Programmes",
   },
 ];
 
@@ -29,11 +29,9 @@ const OrgProofSection = () => {
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
-            Proof
-          </p>
+          
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Built on real-world experience, not theory
+            Built On Real-World Experience, Not Theory
           </h2>
         </div>
 

@@ -33,28 +33,28 @@ const reviews = [{
   testimonial: "The experts are compassionate and truly listen. A rare find in today's world.",
   rating: 5
 },{
-  name: "Priya S.",
-  testimonial: "HappiMynd helped me understand myself better without feeling judged. It's like having a gentle guide.",
+  name: "Pooja N.",
+  testimonial: "Clarity came slowly, but it stayed. That’s what made the difference for me.",
   rating: 5
 }, {
-  name: "Rahul M.",
-  testimonial: "Our team's conscious awareness has transformed how we work together. The change is remarkable.",
+  name: "Siddharth A.",
+  testimonial: "I’ve tried many approaches before, but this one finally stuck. The changes felt real, not forced.",
   rating: 5
 }, {
-  name: "Ananya K.",
-  testimonial: "Finally, a space that feels safe and welcoming. I've grown so much in just a few months.",
+  name: "Neha L.",
+  testimonial: "We noticed a shift within weeks. Better conversations, healthier mindsets, and stronger collaboration.",
   rating: 5
 },{
-  name: "Priya S.",
-  testimonial: "HappiMynd helped me understand myself better without feeling judged. It's like having a gentle guide.",
+  name: "Kapil R.",
+  testimonial: "It didn’t feel like a program—it felt like a journey built around me.",
   rating: 5
 }, {
-  name: "Rahul M.",
-  testimonial: "Our team's conscious awareness has transformed how we work together. The change is remarkable.",
+  name: "Alaya M.",
+  testimonial: "What stood out was how practical everything was. I could actually apply the insights to my daily life.",
   rating: 5
 }, {
-  name: "Ananya K.",
-  testimonial: "Finally, a space that feels safe and welcoming. I've grown so much in just a few months.",
+  name: "Ananya Raj S.",
+  testimonial: "The experience felt thoughtful and human. I wasn’t rushed or judged—just steadily guided forward.",
   rating: 5
 },];
 

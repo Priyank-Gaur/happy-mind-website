@@ -25,11 +25,11 @@ const OrgTrustConfidentiality = () => {
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
+          <p className="text-4xl font-bold text-primary uppercase tracking-wider mb-3">
             Privacy, Trust & Ethics
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Confidentiality is foundational to adoption and impact
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-4">
+            Confidentiality Is Foundational To Adoption And Impact
           </h2>
           <p className="font-sans text-lg text-muted-foreground">
             Trust is not a feature. It is the system.
@@ -40,8 +40,8 @@ const OrgTrustConfidentiality = () => {
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* What Leadership Receives */}
           <div className="bg-primary/5 rounded-2xl p-8 border border-primary/20">
-            <h3 className="font-serif text-lg font-semibold text-foreground mb-6">
-              What leadership receives
+            <h3 className="font-serif text-md font-semibold text-foreground mb-6">
+              What Leadership Receives
             </h3>
             <div className="space-y-4">
               {leadershipReceives.map((item, index) => (
@@ -55,8 +55,8 @@ const OrgTrustConfidentiality = () => {
 
           {/* What Leadership Does NOT Receive */}
           <div className="bg-background rounded-2xl p-8 border border-border/30">
-            <h3 className="font-serif text-lg font-semibold text-foreground mb-6">
-              What leadership does NOT receive
+            <h3 className="font-serif text-md font-semibold text-foreground mb-6">
+              What Leadership Does NOT Receive
             </h3>
             <div className="space-y-4">
               {leadershipDoesNot.map((item, index) => (
@@ -70,8 +70,8 @@ const OrgTrustConfidentiality = () => {
 
           {/* What Employees Experience */}
           <div className="bg-card rounded-2xl p-8 border border-border/30 shadow-sm">
-            <h3 className="font-serif text-lg font-semibold text-foreground mb-6">
-              What employees experience
+            <h3 className="font-serif text-md font-semibold text-foreground mb-6">
+              What Employees Experience
             </h3>
             <div className="space-y-4">
               {employeeExperience.map((item, index) => (

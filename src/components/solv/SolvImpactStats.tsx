@@ -10,7 +10,7 @@ const stats = [
   {
     icon: Clock,
     value: "5,000+",
-    label: "Counseling Minutes",
+    label: "Counseling Hours",
   },
   {
     icon: Target,

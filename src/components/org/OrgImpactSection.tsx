@@ -8,12 +8,12 @@ const impactStats = [
   },
   {
     icon: Scale,
-    value: "5×",
+    value: "5X",
     label: "Conflict Resolution effective with high EQ leaders",
   },
   {
     icon: Lightbulb,
-    value: "3×",
+    value: "3X",
     label: "Higher innovation inspiration with Emotionally Intelligent leaders",
   },
   {
@@ -29,10 +29,10 @@ const OrgImpactSection = () => {
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
+          <p className="text-4xl font-bold uppercase tracking-wider mb-3">
             Impact — A Systematic Change
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+          <h2 className="font-serif text-xl md:text-2xl font-semibold text-foreground">
             What organisations see when people intelligence system is embedded
           </h2>
         </div>
@@ -48,7 +48,7 @@ const OrgImpactSection = () => {
               <div className="font-serif text-4xl font-bold text-primary mb-2">
                 {stat.value}
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {stat.label}
               </p>
             </div>

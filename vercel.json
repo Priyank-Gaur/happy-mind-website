@@ -5,6 +5,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/sanctum/:path*",
+      "destination": "https://happimynd.com/sanctum/:path*"
+    },
+    {
+      "source": "/submit-contact",
+      "destination": "https://happimynd.com/submit-contact"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

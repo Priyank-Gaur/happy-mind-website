@@ -10,17 +10,17 @@ const gaps = [
 const valuePillars = [
   {
     icon: Target,
-    title: "Precision over programmes",
+    title: "Precision Over Generic Programmes",
     description: "No one-size-fits-all initiatives. Every solution is shaped around your organisation's real dynamics.",
   },
   {
     icon: Lightbulb,
-    title: "Insight before action",
+    title: "Insight Before Action",
     description: "We diagnose first, intervene second — ensuring effort goes where impact is highest.",
   },
   {
     icon: TrendingUp,
-    title: "Business + People outcomes",
+    title: "Business + People Outcomes",
     description: "Performance and well-being improve together, not at each other's cost.",
   },
 ];
@@ -43,10 +43,10 @@ const OrgStrategicGapWithHappiMynd = () => {
           {/* Right Content - Strategic Gap Section */}
           <div className="lg:w-1/2 space-y-4">
             <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
-              Why do most corporate growth initiatives fail?
+              Why Do Most Corporate Growth Initiatives Fail?
             </h2>
 
-            <p className="font-sans text-base text-muted-foreground leading-relaxed">
+            <p className="font-sans text-xl text-muted-foreground leading-relaxed">
               Most programmes fail not because organisations do not care — but because 
               the fundamentals are misplaced.
             </p>
@@ -74,7 +74,7 @@ const OrgStrategicGapWithHappiMynd = () => {
             </p>
 
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              From people problems to <span className="text-primary">people intelligence</span>
+              From People Problems to <span className="text-primary">People Intelligence</span>
             </h2>
 
             <h3 className="font-sans text-xl text-muted-foreground">
@@ -82,14 +82,14 @@ const OrgStrategicGapWithHappiMynd = () => {
             </h3>
 
             <div className="space-y-4 text-muted-foreground leading-relaxed">
-              <p>
+              <p className="text-xl">
                 Most organisations respond to people's challenges with generic programmes; 
                 training modules, EAPs, wellness weeks, surveys and engagement drives.
               </p>
-              <p className="font-semibold text-foreground">
-                HappiMynd works differently.
+              <p className="text-primary font-bold text-foreground text-2xl">
+                HappiMynd Works Differently.
               </p>
-              <p>
+              <p className="text-xl">
                 We use psychodiagnostic intelligence to identify the real drivers behind 
                 performance gaps and build targeted interventions that strengthen leadership, 
                 teams and culture at the root.

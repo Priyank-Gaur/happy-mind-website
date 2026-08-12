@@ -34,9 +34,15 @@ const OrgScrollingBanner = () => {
             variant="default"
             size="lg"
             className="rounded-full px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent('open-contact-form'));
+            }}
           >
             Talk To HappiMynd
           </Button>
+          <a href="https://drive.google.com/file/d/1AmW0MIjUj7U3UUbkAJiXznMPkJ8wezgA/view?usp=sharing">
+          
           <Button
             variant="default"
             size="lg"
@@ -44,6 +50,7 @@ const OrgScrollingBanner = () => {
           >
             Download Brochure
           </Button>
+          </a>
         </div>
       </div>
     </section>

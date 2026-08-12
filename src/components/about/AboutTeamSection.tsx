@@ -7,26 +7,31 @@ const teamMembers = [
   {
     name: "Amit Rathi",
     role: "Founder",
+    description:
+      "CXO Leader | 2.5 Decades Exp. | IIM Alumni | Conscious Leadership Coach",
     image: amitRathiImage,
     linkedin: "#",
   },
   {
     name: "Ravi Kant Suman",
     role: "Co-Founder",
+    description: "2.5 Decades Exp. | L&D Professional",
     image: raviKantImage,
     linkedin: "#",
   },
   {
     name: "Dr. Neeraj Tripathi",
     role: "Co-Founder",
+    description:
+      "U.K. Based Senior Psychiatrist | 20 Yrs. Exp. | Global Research Expert",
     image: neerajTripathiImage,
     linkedin: "#",
-  }
+  },
 ];
 
 const AboutTeamSection = () => {
   return (
-    <section className="py-24 px-6 lg:px-16 bg-card">
+    <section id="our-team" className="py-24 px-6 lg:px-16 bg-card">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -48,8 +53,8 @@ const AboutTeamSection = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
-                {/* LinkedIn Button 
+
+                {/* LinkedIn Button
                 <a
                   href={member.linkedin}
                   target="_blank"
@@ -64,8 +69,11 @@ const AboutTeamSection = () => {
               <h3 className="font-serif text-lg font-semibold text-foreground mb-1">
                 {member.name}
               </h3>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-primary text-sm font-medium mb-1">
                 {member.role}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {member.description}
               </p>
             </div>
           ))}

@@ -3,26 +3,26 @@ import { Shield, Lock, Eye } from "lucide-react";
 import organizationHero from "@/assets/org-page-hero.png";
 
 const microTablets = [
-  { icon: Shield, text: "Enterprise-grade security" },
-  { icon: Lock, text: "GDPR compliant" },
-  { icon: Eye, text: "Anonymised insights" },
+  { icon: Shield, text: "Enterprise-Grade Security" },
+  { icon: Lock, text: "GDPR Compliant" },
+  { icon: Eye, text: "Anonymised Insights" },
 ];
 
 const peopleIntelligenceStats = [
   {
-    value: "$438B",
+    value: "$438 Bn.",
     label: "disengaged employees cost to company affecting culture and collaboration",
   },
   {
-    value: "$8.8T",
+    value: "$8.8 Tn.",
     label: "cost of lost productivity annually impacting performance and outcome",
   },
   {
-    value: "$4T",
+    value: "$4 Tn.",
     label: "cost due to employee leaving before their concerns are visible",
   },
   {
-    value: "$550B",
+    value: "$550 Bn.",
     label: "costs due to lack of effective leadership",
   },
 ];
@@ -56,8 +56,8 @@ const OrgHeroSection = () => {
           <div className="space-y-8 text-center lg:text-left">
             {/* H1 */}
             <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground">
-              Where people intelligence drives{" "}
-              <span className="text-primary">business performance</span>
+              Where People Intelligence Drives{" "}
+              <span className="text-primary">Business Performance</span>
             </h1>
 
             {/* H2 */}

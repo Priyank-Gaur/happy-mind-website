@@ -13,11 +13,11 @@ const OrgScalability = () => {
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-6">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
+          <p className="text-4xl font-bold text-primary uppercase tracking-wider mb-3">
             Let's Grow Together
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Designed for scale — without losing Trust
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-4">
+            Designed For Scale — Without Losing Trust
           </h2>
           <p className="font-sans text-lg text-muted-foreground max-w-2xl mx-auto">
             From fast-growing startups to large enterprises, HappiMynd adapts without 

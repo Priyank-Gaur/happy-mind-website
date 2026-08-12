@@ -15,8 +15,8 @@ const AboutApproachSection = () => {
           Our Approach
         </h2>
         
-        <p className="font-sans text-lg md:text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
-          We are a phygital platform — a conscious growth system for individuals and People Intelligence System for organisations using technology-backed approach, evidence-based tools, positive psychology, and research.
+        <p className="font-sans text-lg md:text-xl text-muted-foreground leading-relaxed mb-12 max-w-4xl mx-auto">
+          We are a phygital platform delivering a structured <span className="text-primary">Conscious Growth Ecosystem</span> for individuals and a <span className="text-primary">People Intelligence System</span> for organisations. Our approach integrates technology, evidence-based tools, positive psychology, and behavioural research to turn human insight into measurable growth.
         </p>
 
         {/* Approach Pills */}
