@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import solvLogo from "@/assets/solv-final-logo.png";
-import happiMascot from "@/assets/happi-mascot.png";
+import viewPlansMascot from "@/assets/view-plans-mascot.png";
 
 const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
   const [currentText, setCurrentText] = useState('');
@@ -44,9 +44,8 @@ const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: num
 
 const AnnouncementBanner = () => {
   const texts = [
-    "Two minutes. One Form. Your Conscious Growth Begins",
-    "Special Offer for our early users.",
-    "Grow with SOLV - The journey to becoming your better version designed to help you grow with awareness, confidence and clarity."
+    "Get the tools, guidance and expert support you need - with plans starting at just ₹199.",
+    "Choose your level of support and grow at your own pace."
   ];
   
   const animatedText = useTypewriter(texts, 50, 25);
@@ -73,20 +72,20 @@ const AnnouncementBanner = () => {
         <div className="absolute inset-0 bg-gradient-to-bl from-white/50 via-transparent to-transparent animate-mist-pulse" />
       </div>
 
-      {/* Happi, waving from the right. Decorative, so it stays out of the
-          reading order and never intercepts clicks on the banner. */}
+      {/* View Plans Mascot peeking from the left (upper part only) */}
       <img
-        src={happiMascot}
+        src={viewPlansMascot}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute bottom-0 right-4 z-10 hidden h-28 w-auto animate-float drop-shadow-lg md:block lg:right-16 lg:h-36 xl:h-44"
+        className="pointer-events-none select-none absolute -bottom-16 left-6 z-10 hidden h-48 w-auto object-cover object-top animate-float drop-shadow-xl md:block md:-bottom-20 md:h-60 md:left-10 lg:left-14 lg:-bottom-28 lg:h-72 xl:left-20 xl:-bottom-32 xl:h-80"
       />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
         {/* Main line */}
         <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
-          Begin Your Growth Journey Complimentary!
+          Start Your Growth Journey Today.
+
         </h1>
         
         {/* Animated Supporting Text */}
@@ -96,20 +95,17 @@ const AnnouncementBanner = () => {
             <span className="inline-block w-2 h-5 bg-foreground/80 ml-1 animate-pulse"></span>
           </p>
           <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80 text-center">
-            An expert led program, for guidance on difficult life situations.
+            Plans starting at just ₹199
           </p>
         </div>
         
         {/* CTA Button */}
-        <Link to="/solv">
-          <Button
-            variant="outline"
-            className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
-          >
-
-            LET'S SOLV IT
-          </Button>
-        </Link>
+        <Button
+          variant="outline"
+          className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
+        >
+          Explore Now
+        </Button>
       </div>
     </div>
   );

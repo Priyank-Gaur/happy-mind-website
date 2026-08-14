@@ -45,20 +45,28 @@ const Navbar = () => {
             <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               About
             </Link>
-            {/*<a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Vibe with Us
-            </a>*/}
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4 shrink-0">
-            {/* Account links, kept quiet so the buttons lead */}
-            <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Log In
-            </a>
-            <a href="https://happimynd.com/signup" className="hidden xl:inline text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Get Started
-            </a>
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            {/* Account buttons with borders */}
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-border text-foreground hover:bg-accent hover:border-primary/50 transition-all font-medium text-xs sm:text-sm"
+            >
+              <a href="https://happimynd.com/login">Log In</a>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-medium text-xs sm:text-sm"
+            >
+              <a href="https://happimynd.com/signup">Get Started</a>
+            </Button>
 
             <span className="h-5 w-px bg-border" aria-hidden="true" />
 
@@ -67,14 +75,14 @@ const Navbar = () => {
                 asChild
                 variant="ghost"
                 size="sm"
-                className="px-3 border border-border text-foreground hover:bg-accent"
+                className="px-3 border border-border text-foreground hover:bg-accent rounded-full"
               >
                 <a
                   href={PLAY_STORE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Download />
+                  <Download className="w-4 h-4" />
                   <span className="hidden xl:inline">Download App</span>
                   <span className="xl:hidden">App</span>
                 </a>
@@ -83,10 +91,10 @@ const Navbar = () => {
               <Button
                 variant="default"
                 size="sm"
-                className="px-4"
+                className="px-4 rounded-full"
                 onClick={() => setBookingOpen(true)}
               >
-                <CalendarDays />
+                <CalendarDays className="w-4 h-4" />
                 Book a Session
               </Button>
             </div>
@@ -121,10 +129,7 @@ const Navbar = () => {
             <Link to="/about" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               About
             </Link>
-            <a href="#blog" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
-              Vibe with Us
-            </a>
-            <div className="pt-4 space-y-4 border-t border-border/30">
+            <div className="pt-4 space-y-3 border-t border-border/30">
               <Button
                 variant="default"
                 size="sm"
@@ -142,7 +147,7 @@ const Navbar = () => {
                 asChild
                 variant="ghost"
                 size="sm"
-                className="w-full border border-border text-foreground hover:bg-accent"
+                className="w-full border border-border text-foreground hover:bg-accent rounded-full"
               >
                 <a
                   href={PLAY_STORE_URL}
@@ -150,18 +155,28 @@ const Navbar = () => {
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Download />
+                  <Download className="w-4 h-4 mr-1.5" />
                   Download App
                 </a>
               </Button>
 
-              <div className="flex gap-4">
-                <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                  Log In
-                </a>
-                <a href="https://happimynd.com/signup" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                  Get Started
-                </a>
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="w-full rounded-full border border-border text-foreground hover:bg-accent"
+                >
+                  <a href="https://happimynd.com/login">Log In</a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="w-full rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  <a href="https://happimynd.com/signup">Get Started</a>
+                </Button>
               </div>
             </div>
           </div>
