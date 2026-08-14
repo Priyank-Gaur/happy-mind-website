@@ -95,7 +95,7 @@ const AnnouncementBanner = () => {
             <span className="inline-block w-2 h-5 bg-foreground/80 ml-1 animate-pulse"></span>
           </p>
           <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80 text-center">
-            Plans starting at just ₹199
+            Plans starting at just ₹ 199
           </p>
         </div>
         
