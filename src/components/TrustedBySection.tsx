@@ -55,7 +55,7 @@ const brandCategories = [
 
 const TrustedBySection = () => {
   return (
-    <section id="partners-brands" className="py-12 bg-white">
+    <section id="partners-brands" className="py-12">
       <div className="container mx-auto px-6">
         <div className="mb-8 text-center animate-fade-in">
           <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-2">TRUSTED BY</h2>
@@ -71,7 +71,7 @@ const TrustedBySection = () => {
             {partnerLogos.map((partner, index) => (
               <div 
                 key={index} 
-                className="bg-white rounded-lg p-4 shadow-soft hover:shadow-card transition-smooth group cursor-pointer hover-lift"
+                className="bg-white rounded-lg p-4 transition-smooth group cursor-pointer hover-lift"
               >
                 <div className="text-center">
                   <div className="h-16 w-full bg-white rounded-lg mb-3 flex items-center justify-center group-hover:scale-105 transition-smooth">

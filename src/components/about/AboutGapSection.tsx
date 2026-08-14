@@ -29,7 +29,7 @@ const gaps = [
 
 const AboutGapSection = () => {
   return (
-    <section className="py-24 px-6 lg:px-16 bg-card">
+    <section className="py-24 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -43,7 +43,7 @@ const AboutGapSection = () => {
           {gaps.map((gap, index) => (
             <div
               key={index}
-              className="bg-background rounded-2xl p-8 shadow-sm border border-border/50 hover:shadow-md transition-all duration-300"
+              className="bg-white rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-primary/30 transition-all duration-300"
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">

@@ -20,7 +20,7 @@ const challenges = [
 
 const OrgBusinessCase = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -45,7 +45,7 @@ const OrgBusinessCase = () => {
             {challenges.map((challenge, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl p-8 border border-border/30 shadow-sm"
+                className="bg-white rounded-2xl p-8 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
                 <challenge.icon className="w-8 h-8 text-primary/70 mb-4" />
                 <div className="font-serif text-3xl font-bold text-foreground mb-2">

@@ -25,11 +25,11 @@ const SolvImpactStats = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
+  return <section ref={sectionRef} className="py-12 px-6 lg:px-16">
       <div className="container mx-auto max-w-8xl">
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {stats.map((stat, index) => <div key={stat.label} className={`bg-background rounded-2xl p-6 text-center space-y-2 shadow-sm transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
+          {stats.map((stat, index) => <div key={stat.label} className={`bg-white rounded-2xl p-6 text-center space-y-2 shadow-lg hover:shadow-xl border border-border hover:border-primary/30 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
           transitionDelay: `${0.1 + index * 0.1}s`
         }}>
               <div className="font-serif text-3xl md:text-4xl font-semibold text-muted-foreground">

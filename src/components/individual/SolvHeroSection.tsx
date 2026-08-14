@@ -58,11 +58,11 @@ const SolvHeroSection = () => {
         <div className="relative z-20 flex items-center px-6 lg:px-16 py-12 lg:py-0">
           <div className="space-y-8 max-w-xl">
             <div className="space-y-6">
-              <h1 className="text-2xl lg:text-3xl font-semibold text-foreground leading-tight font-sans md:text-3xl">
-                A <span className="text-primary text-5xl">Conscious Growth Space</span> For Life's Real progress.
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-foreground leading-tight font-sans">
+                A <span className="text-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Conscious Growth Space</span> For Life's Real progress.
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed font-serif font-semibold text-left md:text-2xl">
-                We help you understand yourself better, make clearer choices and move forward with confidence through <span className="text-primary">psychology-powered, phygital guidance</span>. 
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed font-serif font-semibold text-left">
+                The journey to be your better version that leads you to make clearer and confident choices. Happiness is derived after knowing yourself through a <span className="text-primary">validated journey</span>. 
               </p>
             </div>
 

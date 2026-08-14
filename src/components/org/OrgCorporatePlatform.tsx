@@ -40,7 +40,7 @@ const modules = [
 
 const OrgCorporatePlatform = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-muted/30">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">

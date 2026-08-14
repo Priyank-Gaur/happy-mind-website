@@ -9,7 +9,7 @@ const environments = [
 
 const OrgScalability = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-6">
@@ -30,7 +30,7 @@ const OrgScalability = () => {
           {environments.map((env, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-6 border border-border/30 shadow-sm text-center hover:shadow-md transition-shadow duration-300"
+              className="bg-white rounded-2xl p-6 border border-border shadow-lg text-center hover:shadow-xl hover:border-primary/30 transition-all duration-300"
             >
               <env.icon className="w-12 h-12 text-primary mx-auto mb-4" />
               <div className="font-serif text-lg font-semibold text-foreground mb-2">

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import solvLogo from "@/assets/solv-final-logo.png";
+import happiMascot from "@/assets/happi-mascot.png";
 
 const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
   const [currentText, setCurrentText] = useState('');
@@ -45,18 +46,18 @@ const AnnouncementBanner = () => {
   const texts = [
     "Two minutes. One Form. Your Conscious Growth Begins",
     "Special Offer for our early users.",
-    "Grow with SOLV- psychology-powered, people-first guidance designed to help you grow with awareness, confidence, and clarity."
+    "Grow with SOLV - The journey to becoming your better version designed to help you grow with awareness, confidence and clarity."
   ];
   
   const animatedText = useTypewriter(texts, 50, 25);
 
   return (
-    <div className="relative w-full overflow-hidden group cursor-pointer transition-all duration-500 hover:brightness-105">
+    <div className="relative w-full overflow-hidden group cursor-pointer">
       {/* Animated lavender gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(265,85%,94%)] via-[hsl(270,85%,90%)] to-[hsl(265,85%,94%)] animate-gradient-flow" />
-      
+      <div className="absolute inset-0 bg-gradient-to-r from-lavender via-lavender-medium to-lavender animate-gradient-flow" />
+
       {/* Secondary flowing gradient layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,40%,92%)/0.5] via-transparent to-[hsl(265,50%,90%)/0.5] animate-gradient-slow" />
+      <div className="absolute inset-0 bg-gradient-to-br from-lavender-light/50 via-transparent to-lavender/50 animate-gradient-slow" />
 
       {/* Left smoky mist effect */}
       <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 lg:w-64">
@@ -71,6 +72,15 @@ const AnnouncementBanner = () => {
         <div className="absolute inset-0 bg-gradient-to-l from-white/60 via-white/20 to-transparent animate-mist-right-slow" />
         <div className="absolute inset-0 bg-gradient-to-bl from-white/50 via-transparent to-transparent animate-mist-pulse" />
       </div>
+
+      {/* Happi, waving from the right. Decorative, so it stays out of the
+          reading order and never intercepts clicks on the banner. */}
+      <img
+        src={happiMascot}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none select-none absolute bottom-0 right-4 z-10 hidden h-28 w-auto animate-float drop-shadow-lg md:block lg:right-16 lg:h-36 xl:h-44"
+      />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
@@ -92,11 +102,11 @@ const AnnouncementBanner = () => {
         
         {/* CTA Button */}
         <Link to="/solv">
-          <Button 
-            variant="outline" 
-            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white flex items-center gap-2"
+          <Button
+            variant="outline"
+            className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
           >
-           
+
             LET'S SOLV IT
           </Button>
         </Link>

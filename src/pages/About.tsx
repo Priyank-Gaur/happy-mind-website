@@ -13,25 +13,25 @@ const About = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16 lg:pt-20">
-        <div className="bg-background">
+        <div className="surface-hero">
           <AboutHeroSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-soft">
           <AboutGapSection />
         </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-tint">
           <AboutMissionVisionSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-card">
           <AboutApproachSection />
         </div>
-        <div className="bg-muted/30">
-          <AboutMilestonesSection />
-        </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="bg-card">
           <AboutTeamSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-card">
+          <AboutMilestonesSection />
+        </div>
+        <div className="surface-tint">
           <FinalInvitationSection />
         </div>
       </main>

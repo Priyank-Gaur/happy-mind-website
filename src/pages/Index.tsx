@@ -17,37 +17,37 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16 lg:pt-20">
-        <div className="bg-background">
+        <div>
           <AnnouncementBanner />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-hero">
           <HeroSection />
         </div>
-        <div className="bg-background">
+        <div className="surface-canvas">
           <FactStats />
         </div>
-        <div className="bg-background">
+        <div className="surface-soft">
           <WhatSpaceSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-canvas">
           <WhoIsThisForSection />
         </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-band">
           <ImpactStatsSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-card">
           <TrustedBySection />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-soft">
           <VoicesSection />
         </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-tint">
           <SocialsSection />
         </div>
-        <div className="bg-background">
+        <div className="bg-card">
           <TrustSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-tint">
           <FinalInvitationSection />
         </div>
       </main>

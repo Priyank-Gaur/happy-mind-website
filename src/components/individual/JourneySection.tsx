@@ -74,7 +74,7 @@ const JourneySection = () => {
   const handleCardClick = (route: string) => {
     navigate(route);
   };
-  return <section ref={sectionRef} className="relative py-12 px-6 lg:px-16 bg-card overflow-hidden">
+  return <section ref={sectionRef} className="relative py-12 px-6 lg:px-16 overflow-hidden">
       {/* Background Journey Footprints */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <svg className="absolute w-full h-full" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" style={{

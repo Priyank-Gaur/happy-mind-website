@@ -25,7 +25,7 @@ const values = [
 
 const AboutMissionVisionSection = () => {
   return (
-    <section className="py-24 px-6 lg:px-16 bg-background">
+    <section className="py-24 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -68,7 +68,7 @@ To advance conscious growth at scale by integrating psychology, research and tec
           {values.map((value, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-6 text-center border border-border/50 hover:shadow-lg transition-all duration-300"
+              className="bg-white rounded-2xl p-6 text-center border border-border hover:shadow-xl hover:border-primary/30 transition-all duration-300 shadow-lg"
             >
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <value.icon className="w-7 h-7 text-primary" />

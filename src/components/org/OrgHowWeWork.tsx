@@ -47,7 +47,7 @@ const eipaModel = [
 
 const OrgHowWeWork = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -65,7 +65,7 @@ const OrgHowWeWork = () => {
             {coreFramework.map((item, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl p-6 border border-border/30 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -95,7 +95,7 @@ const OrgHowWeWork = () => {
             {eipaModel.map((item, index) => (
               <div
                 key={index}
-                className="bg-primary/5 rounded-2xl p-6 border border-primary/20"
+                className="bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <item.icon className="w-10 h-10 text-primary mb-4" />
                 <h4 className="font-serif text-lg font-semibold text-foreground mb-2">

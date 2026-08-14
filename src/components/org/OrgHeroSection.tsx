@@ -45,7 +45,7 @@ const OrgHeroSection = () => {
               className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-md px-4 py-2"
             >
               <tablet.icon className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">{tablet.text}</span>
+              <span className="text-xs sm:text-sm font-medium text-primary">{tablet.text}</span>
             </div>
           ))}
         </div>
@@ -55,33 +55,34 @@ const OrgHeroSection = () => {
           {/* Left Content */}
           <div className="space-y-8 text-center lg:text-left">
             {/* H1 */}
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground">
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground">
               Where People Intelligence Drives{" "}
               <span className="text-primary">Business Performance</span>
             </h1>
 
             {/* H2 */}
-            <h2 className="font-sans text-lg md:text-xl text-muted-foreground leading-relaxed">
+            <h2 className="font-sans text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
               Built on psychodiagnostics and people intelligence, HappiMynd enables 
               organisations to move beyond surface-level metrics and address the real 
-              drivers of performance — behaviour, emotional regulation and personality dynamics.
+              drivers of performance - behaviour, emotional regulation and personality dynamics.
             </h2>
 
             {/* People Intelligence Stats */}
             <div className="space-y-4">
-              <h3 className="font-serif text-xl font-semibold text-foreground">
-                People Intelligence — A Global Need
+              <h3 className="font-serif text-base sm:text-lg md:text-xl font-semibold text-foreground">
+                People Intelligence - A Global Need
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {peopleIntelligenceStats.map((stat, index) => (
                   <div
+                  
                     key={index}
-                    className="bg-muted/50 border border-border/30 rounded-xl p-4 text-left"
+                    className="bg-white border border-border rounded-xl p-5 text-left shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
                   >
-                    <span className="font-serif text-2xl font-bold text-primary">
+                    <span className="font-serif text-xl sm:text-2xl font-bold text-primary">
                       {stat.value}
                     </span>
-                    <p className="text-sm text-muted-foreground mt-1 leading-snug">
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-snug">
                       {stat.label}
                     </p>
                   </div>

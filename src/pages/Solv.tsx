@@ -15,42 +15,42 @@ const Solv = () => {
       <Navbar />
       <main className="pt-16">
         {/* 1. Hero */}
-        <div className="bg-background">
+        <div className="surface-hero">
           <SolvHeroSection />
         </div>
 
         {/* 2. Impact Stats */}
-        <div className="bg-muted/30">
+        <div className="bg-card">
           <SolvImpactStats />
         </div>
 
         {/* 3. Reality Check */}
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-soft">
           <SolvRealityCheck />
         </div>
 
         {/* 4. Bridge Statement */}
-        <div className="bg-background">
+        <div className="surface-canvas">
           <SolvBridgeStatement />
         </div>
 
         {/* 5. How It Works */}
-        <div className="bg-muted/30">
+        <div className="bg-card">
           <SolvHowItWorks />
         </div>
 
         {/* 6. Intro Session Experience */}
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-canvas">
           <SolvIntroSession />
         </div>
 
         {/* 7. Conversion Offer */}
-        <div className="bg-background">
+        <div className="surface-tint">
           <SolvConversionOffer />
         </div>
 
         {/* 8. Trust, Privacy & Security */}
-        <div className="bg-muted/30">
+        <div className="surface-canvas">
           <SolvPrivacySecurity />
         </div>
       </main>

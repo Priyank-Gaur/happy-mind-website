@@ -38,7 +38,7 @@ const SolvImpactStats = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-6 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
+    <section ref={sectionRef} className="py-6 px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (

@@ -33,7 +33,7 @@ const SolvRealityCheck = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16">
       <div className="container mx-auto max-w-4xl">
         <div
           className={`text-center space-y-6 mb-12 transition-all duration-700 ${
@@ -57,7 +57,7 @@ const SolvRealityCheck = () => {
           {stats.map((stat, index) => (
             <div
               key={stat.label}
-              className="bg-card rounded-2xl p-6 text-center space-y-3 shadow-sm"
+              className="bg-white rounded-2xl p-6 text-center space-y-3 shadow-lg border border-border hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               style={{ transitionDelay: `${0.3 + index * 0.1}s` }}
             >
               <div className="font-serif text-3xl md:text-4xl font-semibold text-primary">

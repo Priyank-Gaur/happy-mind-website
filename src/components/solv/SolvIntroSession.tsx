@@ -26,7 +26,7 @@ const SolvIntroSession = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-card">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16">
       <div className="container mx-auto max-w-10xl">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           {/* Content on the left */}

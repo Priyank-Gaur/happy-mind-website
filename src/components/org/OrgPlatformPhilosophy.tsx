@@ -2,7 +2,7 @@ import { Layers } from "lucide-react";
 
 const OrgPlatformPhilosophy = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-4xl text-center">
         <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-12 md:p-16 border border-primary/20">
           <Layers className="w-12 h-12 text-primary mx-auto mb-8" />

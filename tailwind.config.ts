@@ -56,7 +56,22 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+  			/* Brand accents - use sparingly, on top of the semantic tokens */
+  			lavender: {
+  				DEFAULT: 'hsl(var(--lavender))',
+  				light: 'hsl(var(--lavender-light))',
+  				medium: 'hsl(var(--lavender-medium))',
+  				deep: 'hsl(var(--lavender-deep))'
+  			},
+  			aqua: {
+  				DEFAULT: 'hsl(var(--aqua))',
+  				deep: 'hsl(var(--aqua-deep))'
+  			},
+  			'pastel-blue': 'hsl(var(--pastel-blue))',
+  			peach: 'hsl(var(--peach))',
+  			mint: 'hsl(var(--mint))',
+  			sand: 'hsl(var(--sand))'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -180,10 +195,14 @@ export default {
   			'2xs': 'var(--shadow-2xs)',
   			xs: 'var(--shadow-xs)',
   			sm: 'var(--shadow-sm)',
+  			DEFAULT: 'var(--shadow)',
   			md: 'var(--shadow-md)',
   			lg: 'var(--shadow-lg)',
   			xl: 'var(--shadow-xl)',
-  			'2xl': 'var(--shadow-2xl)'
+  			'2xl': 'var(--shadow-2xl)',
+  			soft: 'var(--shadow-soft)',
+  			card: 'var(--shadow-card)',
+  			glow: 'var(--shadow-glow)'
   		},
   		fontFamily: {
   			sans: [

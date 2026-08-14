@@ -11,6 +11,8 @@ import Solv from "./pages/Solv";
 import About from "./pages/About";
 import FloatingContactButton from "./components/FloatingContactButton";
 import ScrollToTop from "./components/ScrollToTop";
+import MascotIntro from "./components/MascotIntro";
+import WelcomeAudio from "./components/WelcomeAudio";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <FloatingContactButton />
+      <MascotIntro />
+      <WelcomeAudio />
       <BrowserRouter>
         <ScrollToTop />
         <Routes>

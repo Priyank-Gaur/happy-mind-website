@@ -23,7 +23,7 @@ const testimonials = [{
 }];
 const clientLogos = ["Partner 1", "Partner 2", "Partner 3", "Partner 4", "Partner 5", "Partner 6"];
 const ProofSection = () => {
-  return <section className="py-24 px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
+  return <section className="py-24 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl space-y-20">
         {/* Stats */}
         <div className="text-center">

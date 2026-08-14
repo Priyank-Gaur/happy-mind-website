@@ -10,7 +10,7 @@ const pills = [
 
 const SolvHeroSection = () => {
   return (
-    <section className="py-12 md:py-16 px-6 lg:px-16 bg-background">
+    <section className="py-12 md:py-16 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           {/* Content on the left */}
@@ -34,7 +34,7 @@ const SolvHeroSection = () => {
 
             {/* H1 */}
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-6 leading-tight">
-              Conscious Growth for Any Life Challenges
+              Conscious Growth is the Key for Any Life Challenges
             </h1>
 
             {/* H2 */}

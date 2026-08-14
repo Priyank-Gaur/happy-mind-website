@@ -27,7 +27,7 @@ const SolvBackedByPsychology = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-card overflow-hidden">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16 overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div

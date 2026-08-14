@@ -64,7 +64,7 @@ const SocialsSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200"
+      className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16"
     >
       <div className="container mx-auto max-w-6xl">
         {/* Headings */}
@@ -127,8 +127,8 @@ const SocialsSection = () => {
               >
                 {/* Polaroid Frame */}
                 <div 
-                  className={`bg-card rounded-xl p-2 sm:p-3 pb-4 ${card.tilt} hover:rotate-0 transition-transform duration-500 ease-out ${
-                    isVisible ? "shadow-lg" : "shadow-none"
+                  className={`bg-white rounded-xl p-2 sm:p-3 pb-4 border border-border ${card.tilt} hover:rotate-0 transition-transform duration-500 ease-out ${
+                    isVisible ? "shadow-xl" : "shadow-none"
                   }`}
                   style={{
                     boxShadow: isVisible 

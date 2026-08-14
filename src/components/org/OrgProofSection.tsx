@@ -25,7 +25,7 @@ const proofStats = [
 
 const OrgProofSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-muted/30">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
@@ -40,7 +40,7 @@ const OrgProofSection = () => {
           {proofStats.map((stat, index) => (
             <div
               key={index}
-              className="bg-background rounded-2xl p-6 border border-border/30 shadow-sm text-center"
+              className="bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl transition-all duration-300 text-center"
             >
               <stat.icon className="w-8 h-8 text-primary mx-auto mb-4" />
               <div className="font-serif text-2xl md:text-3xl font-bold text-primary mb-2">

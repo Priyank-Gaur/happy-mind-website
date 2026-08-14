@@ -9,17 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-white",
-        destructive: "border-2 border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-white",
-        outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-white",
-        secondary: "border-2 border-secondary bg-transparent text-secondary hover:bg-secondary hover:text-white",
+        default: "gradient-brand text-primary-foreground hover:brightness-110 shadow-soft hover:shadow-glow",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md hover:shadow-lg",
+        outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground shadow-xs hover:shadow-soft",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-accent shadow-xs hover:shadow-soft",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-white",
-        heroOutline: "border-2 border-primary/30 bg-background/80 text-foreground hover:border-primary hover:bg-primary hover:text-white backdrop-blur-sm",
-        cta: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-white font-semibold",
-        ctaOutline: "border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold",
-        nav: "text-foreground/80 hover:text-primary hover:bg-transparent font-medium",
       },
       size: {
         default: "h-10 px-5 py-2",
