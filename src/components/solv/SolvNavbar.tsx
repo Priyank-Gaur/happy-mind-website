@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { BookSessionDialog } from "@/v2/components/book-session-dialog";
+import { consumeBookingResume } from "@/v2/lib/bookings";
 
 const SolvNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookingOpen(true);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">

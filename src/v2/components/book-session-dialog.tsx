@@ -28,6 +28,8 @@ import {
   TIME_SLOTS,
   savePendingBooking,
   getPendingBooking,
+  markBookingResume,
+  clearPendingBooking,
   bookings,
   type PreferredSlot,
   type BookingPayload,
@@ -182,10 +184,6 @@ export function BookSessionDialog({
   };
 
   const handleBookNow = async () => {
-    if (!checkAuthOrRedirect(navigate, typeof window !== "undefined" ? window.location.pathname : "/", "Please log in to book a session.")) {
-      onOpenChange(false);
-      return;
-    }
     if (!validateSlots()) return;
     if (!date1 || !date2 || !slot1 || !slot2) return;
 
@@ -200,15 +198,24 @@ export function BookSessionDialog({
       slot: slot2,
     };
 
+    // Save the visitor's chosen slots BEFORE any auth handoff, so the same
+    // form continues (pre-filled) once they come back from login.
+    savePendingBooking({
+      serviceKey: selectedServiceKey,
+      serviceName: activeService.name,
+      slot1: slot1Data,
+      slot2: slot2Data,
+      plan: service?.plan || null,
+    });
+
+    if (!checkAuthOrRedirect(navigate, typeof window !== "undefined" ? window.location.pathname : "/", "Please log in to book a session.")) {
+      markBookingResume();
+      onOpenChange(false);
+      return;
+    }
+
     if (isHappiTalk && !selectedPsychologist) {
-      // Save slots & plan to sessionStorage and redirect to /experts page to pick psychologist
-      savePendingBooking({
-        serviceKey: "happitalk",
-        serviceName: "HappiTALK",
-        slot1: slot1Data,
-        slot2: slot2Data,
-        plan: service?.plan || null,
-      });
+      // Slots are already saved above — redirect to /experts page to pick psychologist
       onOpenChange(false);
       toast.info("Preferred slots saved! Select your psychologist below to complete booking.");
       navigate({ to: "/experts" });
@@ -289,6 +296,7 @@ export function BookSessionDialog({
     const plan = activeService.name;
 
     cart.clear();
+    clearPendingBooking();
     setSubmittingPayment(false);
     onOpenChange(false);
     navigate({

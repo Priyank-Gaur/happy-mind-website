@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen, Headphones, CirclePlay, Lightbulb, Clock, Image, P
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
+import { consumeBookingResume } from "@/v2/lib/bookings";
 import { cn } from "@/v2/lib/utils";
 
 import calmMorningUrl from "@/v2/assets/audio/calm-morning.mp3";
@@ -352,6 +353,11 @@ function ResourcesPage() {
     key: "happitalk",
     name: "HappiTALK",
   });
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookOpen(true);
+  }, []);
 
   const [currentTrack, setCurrentTrack] = useState<(typeof FOCUS_SESSIONS)[0] | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);

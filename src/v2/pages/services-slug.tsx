@@ -15,6 +15,7 @@ import { cn } from "@/v2/lib/utils";
 import { cart } from "@/v2/lib/cart-store";
 import { toast } from "sonner";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
+import { consumeBookingResume } from "@/v2/lib/bookings";
 import { getCatalog } from "@/v2/data/service-catalog";
 import { payForBundle } from "@/v2/lib/website-api";
 import { auth } from "@/v2/lib/auth";
@@ -480,6 +481,11 @@ function SharedPricingPage() {
   // Unified Booking Flow dialog state
   const [bookOpen, setBookOpen] = useState(false);
   const [bookingServiceContext, setBookingServiceContext] = useState<BookServiceContext | null>(null);
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookOpen(true);
+  }, []);
 
   // Auto-scroll 'Why Choose HappiMynd' 3-item pages every 4 seconds
   useEffect(() => {

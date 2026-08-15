@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Download, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BookSessionDialog } from "@/v2/components/book-session-dialog";
+import { consumeBookingResume } from "@/v2/lib/bookings";
 import logo from "@/assets/happimynd-logo.png";
 import solvLogo from "@/assets/solv-final-logo.png";
 
@@ -12,6 +13,11 @@ const PLAY_STORE_URL =
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookingOpen(true);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">

@@ -23,6 +23,7 @@ export type BookingPayload = {
 };
 
 const PENDING_STORAGE_KEY = "happimynd_pending_booking_v1";
+const RESUME_KEY = "happimynd:booking-resume-v2";
 
 export type PendingBookingState = {
   serviceKey: string;
@@ -67,6 +68,37 @@ export function clearPendingBooking() {
   } catch {
     // ignore
   }
+}
+
+/**
+ * Marks that a booking was in progress when the visitor was handed to login,
+ * so the booking dialog can reopen (with the saved slots) on the return trip.
+ */
+export function markBookingResume() {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(RESUME_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * True when the visitor just came back from login mid-booking. Clears the
+ * marker as it reads it. The saved pending booking (if any) carries the slots.
+ */
+export function consumeBookingResume(): boolean {
+  if (typeof window === "undefined") return false;
+  let resume = false;
+  try {
+    if (sessionStorage.getItem(RESUME_KEY) === "1") {
+      resume = true;
+      sessionStorage.removeItem(RESUME_KEY);
+    }
+  } catch {
+    // ignore unavailable storage
+  }
+  return resume;
 }
 
 export type Booking = {

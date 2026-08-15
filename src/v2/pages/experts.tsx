@@ -28,7 +28,7 @@ import { cn } from "@/v2/lib/utils";
 import { cart } from "@/v2/lib/cart-store";
 import { toast } from "sonner";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
-import { getPendingBooking, clearPendingBooking } from "@/v2/lib/bookings";
+import { getPendingBooking, clearPendingBooking, consumeBookingResume } from "@/v2/lib/bookings";
 import {
   CONCERNS,
   SESSION_PACKS,
@@ -418,6 +418,11 @@ function ExpertsPage() {
   const [bookingServiceContext, setBookingServiceContext] = useState<BookServiceContext | null>(
     null,
   );
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookOpen(true);
+  }, []);
 
   const bookPack = async (
     p: Psychologist,

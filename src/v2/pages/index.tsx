@@ -23,6 +23,7 @@ import { useAssessmentPhase } from "@/v2/lib/assessment";
 import { toast } from "sonner";
 import { cn } from "@/v2/lib/utils";
 import { BookSessionDialog } from "@/v2/components/book-session-dialog";
+import { consumeBookingResume } from "@/v2/lib/bookings";
 
 export default DashboardPage;
 
@@ -372,6 +373,11 @@ function QuickActions() {
 function ContinueJourney() {
   const [bookDialogOpen, setBookDialogOpen] = useState(false);
   const { phase: assessmentPhase } = useAssessmentPhase();
+
+  // Reopen the booking dialog when the visitor returns from login mid-booking
+  useEffect(() => {
+    if (consumeBookingResume()) setBookDialogOpen(true);
+  }, []);
 
   const getHappiLifeCardDetails = () => {
     switch (assessmentPhase) {
