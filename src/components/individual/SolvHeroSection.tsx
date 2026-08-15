@@ -68,11 +68,11 @@ const SolvHeroSection = () => {
 
             <div className="flex flex-wrap gap-4">
            
-              <a href="https://happimynd.com/signup">
+              <Link to="/v2/signup">
               <Button size="lg" variant="outline" className="rounded-full px-8">
                 My Emo Snapshot
               </Button>
-              </a>
+              </Link>
               <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
               <Button size="lg" className="rounded-full px-8">
                 Book My SOLV Session

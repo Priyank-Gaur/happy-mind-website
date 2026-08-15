@@ -13,6 +13,15 @@ export default {
   		}
   	},
   	extend: {
+  		screens: {
+  			xs: '480px'
+  		},
+  		spacing: {
+  			'4.5': '1.125rem',
+  			'7.5': '1.875rem',
+  			'10.5': '2.625rem',
+  			'18': '4.5rem'
+  		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

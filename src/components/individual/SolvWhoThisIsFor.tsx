@@ -22,7 +22,7 @@ const SolvWhoThisIsFor = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const animationRef = useRef();
+  const animationRef = useRef<number>(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

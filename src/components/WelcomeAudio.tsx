@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
+import AUDIO_SRC from "@/v2/assets/audio/calm-morning.mp3";
 
 /* A calm note that greets visitors when they land.
    It plays for 10s, fades out on its own, and can be paused at any time. */
-const AUDIO_SRC = "/audio/calm-morning.mp3";
 const INTRO_DURATION = 10000;
 const FADE_DURATION = 1200;
 const VOLUME = 0.35;

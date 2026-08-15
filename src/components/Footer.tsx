@@ -53,12 +53,12 @@ const Footer = () => {
             <h4 className="font-semibold text-foreground text-sm">Services</h4>
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
               <li>
-                <a
-                  href="https://happimynd.com/signup"
+                <Link
+                  to="/v2/services/happilife"
                   className="hover:text-primary transition-colors"
                 >
                   HappiLIFE
-                </a>
+                </Link>
               </li>
               <li>
                 <a

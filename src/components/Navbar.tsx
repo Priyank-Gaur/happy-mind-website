@@ -56,7 +56,7 @@ const Navbar = () => {
               size="sm"
               className="rounded-full px-4 border border-border text-foreground hover:bg-accent hover:border-primary/50 transition-all font-medium text-xs sm:text-sm"
             >
-              <a href="https://happimynd.com/login">Log In</a>
+                  <Link to="/v2/login" onClick={() => setIsOpen(false)}>Log In</Link>
             </Button>
 
             <Button
@@ -65,7 +65,7 @@ const Navbar = () => {
               size="sm"
               className="rounded-full px-4 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-medium text-xs sm:text-sm"
             >
-              <a href="https://happimynd.com/signup">Get Started</a>
+                  <Link to="/v2/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
             </Button>
 
             <span className="h-5 w-px bg-border" aria-hidden="true" />
@@ -167,7 +167,7 @@ const Navbar = () => {
                   size="sm"
                   className="w-full rounded-full border border-border text-foreground hover:bg-accent"
                 >
-                  <a href="https://happimynd.com/login">Log In</a>
+              <Link to="/v2/login">Log In</Link>
                 </Button>
                 <Button
                   asChild
@@ -175,7 +175,7 @@ const Navbar = () => {
                   size="sm"
                   className="w-full rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 >
-                  <a href="https://happimynd.com/signup">Get Started</a>
+              <Link to="/v2/signup">Get Started</Link>
                 </Button>
               </div>
             </div>
