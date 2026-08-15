@@ -101,10 +101,13 @@ const AnnouncementBanner = () => {
         
         {/* CTA Button */}
         <Button
+          asChild
           variant="outline"
           className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
         >
-          Explore Now
+          <Link to="/v2/services/happiself">
+            Explore Now
+          </Link>
         </Button>
       </div>
     </div>

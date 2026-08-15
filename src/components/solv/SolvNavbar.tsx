@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { BookSessionDialog } from "@/v2/components/book-session-dialog";
 
 const SolvNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -37,7 +39,7 @@ const SolvNavbar = () => {
             <Button variant="outline" size="sm" className="rounded-full">
               Take Assessment
             </Button>
-            <Button size="sm" className="rounded-full">
+            <Button size="sm" className="rounded-full" onClick={() => setBookingOpen(true)}>
               Book Session
             </Button>
           </div>
@@ -86,13 +88,26 @@ const SolvNavbar = () => {
               <Button variant="outline" size="sm" className="rounded-full flex-1">
                 Take Assessment
               </Button>
-              <Button size="sm" className="rounded-full flex-1">
+              <Button
+                size="sm"
+                className="rounded-full flex-1"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setBookingOpen(true);
+                }}
+              >
                 Book Session
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      <BookSessionDialog
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        service={{ key: "solv", name: "SOLV" }}
+      />
     </nav>
   );
 };
