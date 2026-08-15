@@ -24,7 +24,7 @@ const SolvConversionOffer = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-background">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16">
       <div className="container mx-auto max-w-4xl">
         <div
           className={`bg-gradient-to-br from-primary/5 to-accent/50 rounded-3xl p-4 md:p-8 text-center transition-all duration-700 ${

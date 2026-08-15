@@ -24,7 +24,7 @@ const MilestoneCard = ({ milestone, position }: { milestone: typeof milestones[0
 
 const AboutMilestonesSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
           Our Milestones

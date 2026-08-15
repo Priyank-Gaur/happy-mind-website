@@ -9,7 +9,7 @@ const approaches = [
 
 const AboutApproachSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-card">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl text-center">
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-6">
           Our Approach

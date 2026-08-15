@@ -27,7 +27,7 @@ const valuePillars = [
 
 const OrgStrategicGapWithHappiMynd = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         {/* Main Content - Image and first paragraph together */}
         <div className="flex flex-col lg:flex-row gap-12 items-start mb-12">
@@ -105,7 +105,7 @@ const OrgStrategicGapWithHappiMynd = () => {
             {valuePillars.map((pillar, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl p-5 border border-border/30 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-white rounded-2xl p-5 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
                 <div className="flex flex-col gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex-shrink-0 flex items-center justify-center">

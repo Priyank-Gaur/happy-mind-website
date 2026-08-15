@@ -70,7 +70,7 @@ const SolvProductsEcosystem = () => {
           {products.map((product, index) => (
             <div
               key={product.name}
-              className={`group bg-card rounded-2xl p-6 border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-500 cursor-pointer ${
+              className={`group bg-white rounded-2xl p-6 border border-border hover:border-primary/30 hover:shadow-xl shadow-lg transition-all duration-500 cursor-pointer ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${0.05 * index}s` }}

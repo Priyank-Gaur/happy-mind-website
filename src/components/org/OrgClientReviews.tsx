@@ -26,7 +26,7 @@ const reviews = [
 
 const OrgClientReviews = () => {
   return (
-    <section className="py-16 px-6 lg:px-16 bg-background">
+    <section className="py-16 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
@@ -48,7 +48,7 @@ const OrgClientReviews = () => {
             {[...reviews, ...reviews].map((review, index) => (
               <motion.div
                 key={index}
-                className="whitespace-normal bg-card rounded-2xl p-6 border border-border/30 shadow-sm flex-shrink-0 w-80 md:w-[28rem] min-h-80 flex flex-col"
+                className="whitespace-normal bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 md:w-[28rem] min-h-80 flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}

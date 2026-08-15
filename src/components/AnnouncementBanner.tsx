@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import solvLogo from "@/assets/solv-final-logo.png";
+import viewPlansMascot from "@/assets/view-plans-mascot.png";
 
 const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: number = 50) => {
   const [currentText, setCurrentText] = useState('');
@@ -43,20 +44,19 @@ const useTypewriter = (texts: string[], speed: number = 100, backspaceSpeed: num
 
 const AnnouncementBanner = () => {
   const texts = [
-    "Two minutes. One Form. Your Conscious Growth Begins",
-    "Special Offer for our early users.",
-    "Grow with SOLV- psychology-powered, people-first guidance designed to help you grow with awareness, confidence, and clarity."
+    "Get the tools, guidance and expert support you need - with plans starting at just ₹199.",
+    "Choose your level of support and grow at your own pace."
   ];
   
   const animatedText = useTypewriter(texts, 50, 25);
 
   return (
-    <div className="relative w-full overflow-hidden group cursor-pointer transition-all duration-500 hover:brightness-105">
+    <div className="relative w-full overflow-hidden group cursor-pointer">
       {/* Animated lavender gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(265,85%,94%)] via-[hsl(270,85%,90%)] to-[hsl(265,85%,94%)] animate-gradient-flow" />
-      
+      <div className="absolute inset-0 bg-gradient-to-r from-lavender via-lavender-medium to-lavender animate-gradient-flow" />
+
       {/* Secondary flowing gradient layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(270,40%,92%)/0.5] via-transparent to-[hsl(265,50%,90%)/0.5] animate-gradient-slow" />
+      <div className="absolute inset-0 bg-gradient-to-br from-lavender-light/50 via-transparent to-lavender/50 animate-gradient-slow" />
 
       {/* Left smoky mist effect */}
       <div className="absolute left-0 top-0 bottom-0 w-32 md:w-48 lg:w-64">
@@ -72,11 +72,20 @@ const AnnouncementBanner = () => {
         <div className="absolute inset-0 bg-gradient-to-bl from-white/50 via-transparent to-transparent animate-mist-pulse" />
       </div>
 
+      {/* View Plans Mascot peeking from the left (upper part only) */}
+      <img
+        src={viewPlansMascot}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none select-none absolute -bottom-16 left-6 z-10 hidden h-48 w-auto object-cover object-top animate-float drop-shadow-xl md:block md:-bottom-20 md:h-60 md:left-10 lg:left-14 lg:-bottom-28 lg:h-72 xl:left-20 xl:-bottom-32 xl:h-80"
+      />
+
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
         {/* Main line */}
         <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
-          Begin Your Growth Journey Complimentary!
+          Start Your Growth Journey Today.
+
         </h1>
         
         {/* Animated Supporting Text */}
@@ -86,20 +95,17 @@ const AnnouncementBanner = () => {
             <span className="inline-block w-2 h-5 bg-foreground/80 ml-1 animate-pulse"></span>
           </p>
           <p className="font-sans text-xs md:text-xs lg:text-sm text-foreground/80 text-center">
-            An expert led program, for guidance on difficult life situations.
+            Plans starting at just ₹ 199
           </p>
         </div>
         
         {/* CTA Button */}
-        <Link to="/solv">
-          <Button 
-            variant="outline" 
-            className="mt-6 bg-[hsl(var(--background))] text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 hover:bg-primary hover:text-white flex items-center gap-2"
-          >
-           
-            LET'S SOLV IT
-          </Button>
-        </Link>
+        <Button
+          variant="outline"
+          className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
+        >
+          Explore Now
+        </Button>
       </div>
     </div>
   );

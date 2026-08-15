@@ -39,7 +39,7 @@ const SolvHowItWorks = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 px-6 lg:px-16 bg-background overflow-hidden">
+    <section ref={sectionRef} className="py-12 px-6 lg:px-16 overflow-hidden">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div
@@ -111,7 +111,7 @@ const SolvHowItWorks = () => {
                 >
                   {/* Icon Circle with connector dot */}
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-background border-2 border-primary/30 flex items-center justify-center shadow-lg shadow-primary/10">
+                    <div className="w-16 h-16 rounded-full bg-background border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/10">
                       <step.icon className="w-7 h-7 text-primary" />
                     </div>
                     {/* Connector dot on the wave line */}

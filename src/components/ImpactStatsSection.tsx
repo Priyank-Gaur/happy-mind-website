@@ -26,7 +26,7 @@ const ImpactStatsSection = () => {
     }
     return () => observer.disconnect();
   }, []);
-  return <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16 bg-gradient-to-r from-purple-200 via-purple-100 to-purple-200">
+  return <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         <div className={`text-center transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           
@@ -35,10 +35,10 @@ const ImpactStatsSection = () => {
             {stats.map((stat, index) => <div key={stat.label} className={`space-y-3 transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
             transitionDelay: `${0.2 + index * 0.15}s`
           }}>
-                <div className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-foreground">
+                <div className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground">
                   {stat.value}
                 </div>
-                <div className="text-muted-foreground text-xs sm:text-sm md:text-base">
+                <div className="text-muted-foreground text-[10px] sm:text-xs md:text-sm">
                   {stat.label}
                 </div>
               </div>)}

@@ -25,13 +25,13 @@ const realityTiles = [
 
 const OrgBusinessRealityStrip = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-muted/30">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left Content */}
           <div className="space-y-6">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground leading-tight">
-              The Performance Risks Leaders Are Managing — Often Without the Right Lens
+              The Performance Risks Leaders Are Managing - Often Without the Right Lens
             </h2>
 
             <h3 className="text-primary font-serif text-xl md:text-2xl font-semibold text-foreground">
@@ -59,7 +59,7 @@ const OrgBusinessRealityStrip = () => {
             {realityTiles.map((tile, index) => (
               <div
                 key={index}
-                className="bg-card rounded-2xl p-6 border border-border/30 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                   <tile.icon className="w-6 h-6 text-primary" />

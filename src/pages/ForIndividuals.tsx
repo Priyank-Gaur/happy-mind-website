@@ -14,28 +14,28 @@ const ForIndividuals = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16">
-        <div className="bg-background">
+        <div className="surface-hero">
           <SolvHeroSection />
         </div>
-        <div className="bg-muted/30">
+        <div className="bg-card">
           <SolvImpactStats />
         </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="surface-soft">
           <SolvWhoThisIsFor />
         </div>
-        <div className="bg-background">
+        <div className="bg-card">
           <SolvRealityCheck />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-soft">
           <JourneySection />
         </div>
-        <div className="bg-gradient-to-r from-purple-50 via-white to-purple-50">
+        <div className="bg-card">
           <SolvBackedByPsychology />
         </div>
-        <div className="bg-background">
+        <div className="surface-tint">
           <SolvCommunity />
         </div>
-        <div className="bg-muted/30">
+        <div className="surface-canvas">
           <SolvPrivacySecurity />
         </div>
       </main>

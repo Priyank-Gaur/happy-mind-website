@@ -21,7 +21,7 @@ const employeeExperience = [
 
 const OrgTrustConfidentiality = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-muted/30">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -39,7 +39,7 @@ const OrgTrustConfidentiality = () => {
         {/* Three Column Trust Structure */}
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* What Leadership Receives */}
-          <div className="bg-primary/5 rounded-2xl p-8 border border-primary/20">
+          <div className="bg-white rounded-2xl p-8 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300">
             <h3 className="font-serif text-md font-semibold text-foreground mb-6">
               What Leadership Receives
             </h3>
@@ -54,7 +54,7 @@ const OrgTrustConfidentiality = () => {
           </div>
 
           {/* What Leadership Does NOT Receive */}
-          <div className="bg-background rounded-2xl p-8 border border-border/30">
+          <div className="bg-white rounded-2xl p-8 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300">
             <h3 className="font-serif text-md font-semibold text-foreground mb-6">
               What Leadership Does NOT Receive
             </h3>
@@ -69,7 +69,7 @@ const OrgTrustConfidentiality = () => {
           </div>
 
           {/* What Employees Experience */}
-          <div className="bg-card rounded-2xl p-8 border border-border/30 shadow-sm">
+          <div className="bg-white rounded-2xl p-8 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300">
             <h3 className="font-serif text-md font-semibold text-foreground mb-6">
               What Employees Experience
             </h3>

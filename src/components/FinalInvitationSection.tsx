@@ -3,7 +3,7 @@ import { Mail, Phone, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 const FinalInvitationSection = () => {
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16 text-center bg-background">
+    <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16 text-center">
       <div className="container mx-auto max-w-4xl space-y-10">
         {/* Main Heading */}
         <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold leading-tight font-sans text-primary">
@@ -36,7 +36,7 @@ const FinalInvitationSection = () => {
             <Link to="/for-organisations">Explore Corporate Solutions</Link>
           </Button>
           <Button
-            variant="secondary"
+            variant="outline"
             size="lg"
             className="rounded-full px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium"
             onClick={() =>

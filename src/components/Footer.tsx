@@ -6,7 +6,7 @@ import playStoreImg from "@/assets/play_store.png";
 import appStoreImg from "@/assets/app_store.png";
 const Footer = () => {
   return (
-    <footer className="bg-card py-12 sm:py-16 px-4 sm:px-6 lg:px-16">
+    <footer className="bg-card py-12 sm:py-16 px-4 sm:px-6 lg:px-16 border-t border-border">
       <div className="container mx-auto max-w-6xl px-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12">
           {/* Brand Block */}
@@ -58,18 +58,6 @@ const Footer = () => {
                   className="hover:text-primary transition-colors"
                 >
                   HappiLIFE
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.dispatchEvent(new CustomEvent("open-contact-form"));
-                  }}
-                  className="hover:text-primary transition-colors cursor-pointer"
-                >
-                  HappiGUIDE
                 </a>
               </li>
               <li>

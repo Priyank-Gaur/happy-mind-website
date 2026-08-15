@@ -9,7 +9,7 @@ const bannerStats = [
 
 const OrgScrollingBanner = () => {
   return (
-    <section className="py-12 bg-primary/10 overflow-hidden">
+    <section className="py-12 overflow-hidden">
       <div className="container mx-auto px-6 lg:px-16">
         {/* Scrolling Stats */}
         <div className="relative mb-10 overflow-hidden">

@@ -13,63 +13,94 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 4% 95%;
-    --foreground: 240 5% 10%;
+    /* ---------------------------------------------------------------
+       Core tokens - HappiMynd palette
+       Every value below maps 1:1 to a hex in the brand palette.
+       --------------------------------------------------------------- */
 
-    --card: 0 0% 98%;
-    --card-foreground: 240 5% 10%;
+    /* Page background - #F9F7FF */
+    --background: 255 100% 98%;
+    /* Primary text - #191928 */
+    --foreground: 240 23% 13%;
 
-    --popover: 240 5% 90%;
-    --popover-foreground: 240 5% 10%;
+    /* Cards, popovers - #FFFFFF */
+    --card: 0 0% 100%;
+    --card-foreground: 240 23% 13%;
 
-    --primary: 258 89% 66%;
-    --primary-foreground: 250 100% 97%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 23% 13%;
 
-    --secondary: 240 5% 33%;
-    --secondary-foreground: 0 0% 98%;
+    /* Buttons, links, active states - #8E66F1 */
+    --primary: 257 83% 67%;
+    /* Text on primary buttons - #FCFBFF */
+    --primary-foreground: 255 100% 99%;
 
-    --muted: 240 4% 83%;
-    --muted-foreground: 240 5% 10%;
+    /* Secondary surfaces - #EFEBFF */
+    --secondary: 252 100% 96%;
+    /* Text on secondary surfaces - #3C335B */
+    --secondary-foreground: 253 28% 28%;
 
-    --accent: 269 100% 98%;
-    --accent-foreground: 270 91% 65%;
+    /* Subtle backgrounds - #F2EFFE */
+    --muted: 252 88% 97%;
+    /* Placeholder / helper text - #68657F */
+    --muted-foreground: 247 11% 45%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 85% 97%;
+    /* Highlighted elements - #E5DFFF */
+    --accent: 251 100% 94%;
+    /* Text on accent surfaces - #31205A */
+    --accent-foreground: 258 48% 24%;
 
-    --border: 240 4% 83%;
-    --input: 240 4% 83%;
-    --ring: 258 89% 66%;
+    /* Errors, delete actions - #F04C5A */
+    --destructive: 355 85% 62%;
+    --destructive-foreground: 255 100% 99%;
 
-    --radius: 0.5rem;
+    /* Dividers, input borders - #E8E6F4 */
+    --border: 249 39% 93%;
+    /* Form field backgrounds - #ECE9F8 */
+    --input: 252 52% 94%;
+    /* Focus outlines - #A38AF2 */
+    --ring: 254 80% 75%;
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 0.75rem;
 
-    --sidebar-foreground: 240 5% 10%;
+    /* Sidebar mirrors the core surfaces */
+    --sidebar-background: 255 100% 98%;
+    --sidebar-foreground: 240 23% 13%;
+    --sidebar-primary: 257 83% 67%;
+    --sidebar-primary-foreground: 255 100% 99%;
+    --sidebar-accent: 251 100% 94%;
+    --sidebar-accent-foreground: 258 48% 24%;
+    --sidebar-border: 249 39% 93%;
+    --sidebar-ring: 254 80% 75%;
+    --sidebar: 255 100% 98%;
 
-    --sidebar-primary: 258 89% 66%;
+    /* ---------------------------------------------------------------
+       Brand accents
+       --------------------------------------------------------------- */
+    --lavender: 253 100% 94%; /* #E6DFFF */
+    --lavender-deep: 259 81% 63%; /* #8453ED */
+    --lavender-medium: 255 100% 89%; /* #D6C8FF */
+    --lavender-light: 257 100% 95%; /* #EDE6FF */
+    --aqua: 252 100% 95%; /* #ECE7FF */
+    --aqua-deep: 257 83% 67%; /* #8E66F1 */
+    --pastel-blue: 257 100% 95%; /* #EDE6FF */
+    --peach: 255 100% 97%; /* #F3EFFF */
+    --mint: 252 100% 96%; /* #EFEBFF */
+    --sand: 255 100% 98%; /* #F6F3FF */
 
-    --sidebar-primary-foreground: 250 100% 97%;
+    /* Gradient stops */
+    --grad-hero-from: 260 100% 96%; /* #F3EDFF */
+    --grad-hero-to: 258 100% 91%; /* #E0D3FF */
+    --grad-wash-to: 253 100% 91%; /* #DCD2FF */
+    --grad-brand-from: 259 81% 63%; /* #8453ED */
+    --grad-brand-to: 258 82% 59%; /* #7540EC */
 
-    --sidebar-accent: 240 5% 33%;
-
-    --sidebar-accent-foreground: 0 0% 98%;
-
-    --sidebar-border: 240 4% 83%;
-
-    --sidebar-ring: 258 89% 66%;
-
-    --chart-1: 255 91% 76%;
-
-    --chart-2: 270 95% 75%;
-
-    --chart-3: 234 89% 73%;
-
-    --chart-4: 258 89% 66%;
-
-    --chart-5: 240 3% 46%;
-
-    --sidebar: 0 0% 98%;
+    /* Charts pull from the brand accents */
+    --chart-1: 257 83% 67%; /* Aqua Deep  - #8E66F1 */
+    --chart-2: 259 81% 63%; /* Lavender Deep - #8453ED */
+    --chart-3: 255 100% 89%; /* #D6C8FF */
+    --chart-4: 253 100% 94%; /* #E6DFFF */
+    --chart-5: 252 100% 95%; /* #ECE7FF */
 
     --font-sans: Nunito, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
 
@@ -77,79 +108,75 @@ All colors MUST be HSL.
 
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
 
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    /* ---------------------------------------------------------------
+       Elevation - soft/card tinted with #8E66F1, glow with #8453ED
+       --------------------------------------------------------------- */
+    --shadow-2xs: 0 1px 2px 0px hsl(257 83% 67% / 0.05);
 
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(257 83% 67% / 0.08);
 
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-sm: 0 1px 3px 0px hsl(257 83% 67% / 0.1), 0 1px 2px -1px hsl(257 83% 67% / 0.08);
 
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow: 0 2px 6px -1px hsl(257 83% 67% / 0.12), 0 1px 3px -1px hsl(257 83% 67% / 0.08);
 
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 6px 14px -3px hsl(257 83% 67% / 0.15), 0 2px 6px -2px hsl(257 83% 67% / 0.1);
 
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 12px 24px -6px hsl(257 83% 67% / 0.18), 0 6px 10px -6px hsl(257 83% 67% / 0.1);
 
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 24px 40px -10px hsl(257 83% 67% / 0.2), 0 10px 16px -8px hsl(257 83% 67% / 0.1);
 
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --shadow-2xl: 0 32px 64px -16px hsl(257 83% 67% / 0.25);
+
+    /* Named brand shadows */
+    --shadow-soft: 0 8px 24px -8px hsl(257 83% 67% / 0.15);
+    --shadow-card: 0 12px 32px -10px hsl(257 83% 67% / 0.2);
+    --shadow-glow: 0 0 32px hsl(259 81% 63% / 0.45);
 
     --tracking-normal: 0em;
 
     --spacing: 0.25rem;
   }
 
+  /* The site ships light-only; .dark simply re-states the light palette
+     so nothing inverts if the class is ever applied. */
   .dark {
-    --background: 240 5% 10%;
-    --foreground: 0 0% 98%;
+    --background: 255 100% 98%;
+    --foreground: 240 23% 13%;
 
-    --card: 240 3% 15%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 23% 13%;
 
-    --popover: 240 5% 26%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 23% 13%;
 
-    --primary: 255 91% 76%;
-    --primary-foreground: 261 72% 22%;
+    --primary: 257 83% 67%;
+    --primary-foreground: 255 100% 99%;
 
-    --secondary: 240 3% 46%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 252 100% 96%;
+    --secondary-foreground: 253 28% 28%;
 
-    --muted: 240 3% 46%;
-    --muted-foreground: 0 0% 98%;
+    --muted: 252 88% 97%;
+    --muted-foreground: 247 11% 45%;
 
-    --accent: 273 86% 20%;
-    --accent-foreground: 270 95% 75%;
+    --accent: 251 100% 94%;
+    --accent-foreground: 258 48% 24%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 85% 97%;
+    --destructive: 355 85% 62%;
+    --destructive-foreground: 255 100% 99%;
 
-    --border: 240 5% 33%;
-    --input: 240 5% 33%;
-    --ring: 255 91% 76%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 255 91% 76%;
-    --sidebar-primary-foreground: 261 72% 22%;
-    --sidebar-accent: 270 95% 75%;
-    --sidebar-accent-foreground: 273 86% 20%;
-    --sidebar-border: 240 5% 33%;
-    --sidebar-ring: 255 91% 76%;
-    --chart-1: 252 94% 85%;
-    --chart-2: 269 97% 85%;
-    --chart-3: 229 93% 81%;
-    --chart-4: 255 91% 76%;
-    --chart-5: 240 3% 46%;
-    --sidebar: 240 3% 15%;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-    --font-sans: Nunito, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --border: 249 39% 93%;
+    --input: 252 52% 94%;
+    --ring: 254 80% 75%;
+
+    --sidebar-background: 255 100% 98%;
+    --sidebar-foreground: 240 23% 13%;
+    --sidebar-primary: 257 83% 67%;
+    --sidebar-primary-foreground: 255 100% 99%;
+    --sidebar-accent: 251 100% 94%;
+    --sidebar-accent-foreground: 258 48% 24%;
+    --sidebar-border: 249 39% 93%;
+    --sidebar-ring: 254 80% 75%;
+    --sidebar: 255 100% 98%;
   }
 }
 
@@ -193,4 +220,63 @@ All colors MUST be HSL.
 
 .animate-scroll:hover {
   animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------------
+   Gradients from the palette
+   ------------------------------------------------------------------ */
+@layer utilities {
+  .gradient-hero {
+    background: linear-gradient(135deg, hsl(var(--grad-hero-from)) 0%, hsl(var(--grad-hero-to)) 100%);
+  }
+
+  .gradient-lavender {
+    background: linear-gradient(135deg, hsl(var(--lavender)) 0%, hsl(var(--lavender-medium)) 100%);
+  }
+
+  .gradient-aqua,
+  .gradient-peach,
+  .gradient-mint {
+    background: linear-gradient(135deg, hsl(var(--peach)) 0%, hsl(var(--grad-wash-to)) 100%);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, hsl(var(--grad-brand-from)) 0%, hsl(var(--grad-brand-to)) 100%);
+  }
+
+  .bg-gradient-soft {
+    background: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--muted)));
+  }
+
+  /* ----------------------------------------------------------------
+     Section surfaces - the vertical rhythm of every page.
+     Use these instead of ad-hoc hex backgrounds so the whole site
+     shares one ladder of tints:
+       hero   -> richest lavender, page openers only
+       canvas -> #F9F7FF, the default resting surface
+       soft   -> #F2EFFE, the alternating band
+       tint   -> accent wash, for emphasis sections (mission, team, CTA)
+       band   -> strongest full-bleed strip, for stats/proof numbers
+     ---------------------------------------------------------------- */
+  .surface-hero {
+    background: linear-gradient(115deg, hsl(var(--sand)) 0%, hsl(var(--lavender-light)) 48%, hsl(var(--lavender)) 100%);
+  }
+
+  .surface-canvas {
+    background-color: hsl(var(--background));
+  }
+
+  /* --secondary (#EFEBFF) rather than --muted (#F2EFFE): --muted sits so close
+     to the page background that the alternation stops reading. */
+  .surface-soft {
+    background-color: hsl(var(--secondary));
+  }
+
+  .surface-tint {
+    background: linear-gradient(180deg, hsl(var(--peach)) 0%, hsl(var(--accent)) 100%);
+  }
+
+  .surface-band {
+    background: linear-gradient(90deg, hsl(var(--accent)) 0%, hsl(var(--peach)) 50%, hsl(var(--accent)) 100%);
+  }
 }

@@ -43,7 +43,7 @@ const HeroSection = () => {
             {/* Trust Pills - Full width above content */}
         <div className="flex flex-wrap gap-2 sm:gap-4 justify-center mb-8 sm:mb-12">
           {trustPills.map((pill, index) => (
-            <div key={index} className="flex items-center gap-2 bg-white border border-border/30 rounded-md px-3 py-2 sm:px-5 sm:py-2.5 shadow-md flex-shrink-0">
+            <div key={index} className="flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg px-3 py-2 sm:px-5 sm:py-2.5 shadow-lg hover:shadow-xl hover:border-primary/50 transition-all duration-300 flex-shrink-0">
               <pill.icon className="w-4 h-4 text-primary" />
               <span className="text-[10px] sm:text-xs font-medium text-foreground whitespace-normal text-center" style={{
                 fontFamily: "'IBM Plex Sans', sans-serif"
@@ -55,25 +55,25 @@ const HeroSection = () => {
         </div>
 
             {/* Micro-intro */}
-            <p className="font-sans text-xl text-muted-foreground tracking-wide">
+            <p className="font-sans text-sm sm:text-base md:text-lg text-muted-foreground tracking-wide">
               Welcome to
             </p>
             
             {/* H1 */}
-            <h1 className="font-sans text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-muted-foreground">
+            <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-muted-foreground">
               A <span className="text-primary">Conscious Growth Ecosystem</span> Where
             </h1>
             
             {/* H2 - Hero Statement */}
-            <h2 className="font-serif text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed text-foreground">
-              <span className="text-primary">Human Science & Psychology powered</span> technology engages individuals & organisations to become more {" "}
-              <span className="text-primary">aware, capable, and connected.</span>
+            <h2 className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
+              Uniting aspects of <span className="text-primary">psychology and technology</span> that develops individuals and organizations to be more {" "}
+              <span className="text-primary">aware, capable and connected.</span> Understanding yourself empowers you to be your superior version in all walks of life.
             </h2>
             
             {/* H3 - Support Line */}
             <p style={{
             fontFamily: "'IBM Plex Sans', sans-serif"
-          }} className="text-sm md:text-base font-medium tracking-wide font-mono text-muted-foreground">
+          }} className="text-xs sm:text-sm md:text-base font-medium tracking-wide font-mono text-muted-foreground">
               Psychology-powered. Human-led.
             </p>
             

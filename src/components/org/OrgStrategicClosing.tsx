@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const OrgStrategicClosing = () => {
   return (
-    <section className="py-24 px-6 lg:px-16 bg-background">
+    <section className="py-24 px-6 lg:px-16">
       <div className="container mx-auto max-w-4xl text-center">
         {/* H1 */}
         <h2 className="font-serif text-primary text-2xl md:text-3xl font-bold text-foreground mb-8">

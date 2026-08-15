@@ -1,24 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Download, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
+import BookSessionModal from "./BookSessionModal";
+import { consumeBookingResume } from "@/lib/happimyndAuth";
 import logo from "@/assets/happimynd-logo.png";
 import solvLogo from "@/assets/solv-final-logo.png";
 
+const PLAY_STORE_URL =
+  "https://play.google.com/store/apps/details?id=com.happimynd";
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+
+  // Reopen the booking form when the visitor lands back here after logging in
+  useEffect(() => {
+    if (consumeBookingResume()) setBookingOpen(true);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-16">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center shrink-0">
             <img src={logo} alt="HappiMynd" className="h-14 sm:h-16 lg:h-20 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
             <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Home
             </Link>
@@ -34,25 +45,67 @@ const Navbar = () => {
             <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               About
             </Link>
-            {/*<a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Vibe with Us
-            </a>*/}
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Log In
-            </a>
-            <Button asChild variant="default" size="sm" className="rounded-full px-6">
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            {/* Account buttons with borders */}
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-border text-foreground hover:bg-accent hover:border-primary/50 transition-all font-medium text-xs sm:text-sm"
+            >
+              <a href="https://happimynd.com/login">Log In</a>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-medium text-xs sm:text-sm"
+            >
               <a href="https://happimynd.com/signup">Get Started</a>
             </Button>
+
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
+
+            <div className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="px-3 border border-border text-foreground hover:bg-accent rounded-full"
+              >
+                <a
+                  href={PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden xl:inline">Download App</span>
+                  <span className="xl:hidden">App</span>
+                </a>
+              </Button>
+
+              <Button
+                variant="default"
+                size="sm"
+                className="px-4 rounded-full"
+                onClick={() => setBookingOpen(true)}
+              >
+                <CalendarDays className="w-4 h-4" />
+                Book a Session
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-foreground"
+            className="lg:hidden p-2 text-foreground"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -60,7 +113,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-4 border-t border-border/30">
+          <div className="lg:hidden py-4 space-y-4 border-t border-border/30">
             <Link to="/" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               Home
             </Link>
@@ -76,20 +129,64 @@ const Navbar = () => {
             <Link to="/about" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
               About
             </Link>
-            <a href="#blog" className="block text-muted-foreground hover:text-foreground transition-colors py-2">
-              Vibe with Us
-            </a>
-            <div className="flex gap-4 pt-4">
-              <a href="https://happimynd.com/login" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Log In
-              </a>
-              <Button asChild variant="default" size="sm" className="rounded-full px-6">
-                <a href="https://happimynd.com/signup">Get Started</a>
+            <div className="pt-4 space-y-3 border-t border-border/30">
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full rounded-full"
+                onClick={() => {
+                  setIsOpen(false);
+                  setBookingOpen(true);
+                }}
+              >
+                <CalendarDays className="w-4 h-4 mr-1.5" />
+                Book a Session
               </Button>
+
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="w-full border border-border text-foreground hover:bg-accent rounded-full"
+              >
+                <a
+                  href={PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Download className="w-4 h-4 mr-1.5" />
+                  Download App
+                </a>
+              </Button>
+
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="w-full rounded-full border border-border text-foreground hover:bg-accent"
+                >
+                  <a href="https://happimynd.com/login">Log In</a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="w-full rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  <a href="https://happimynd.com/signup">Get Started</a>
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
+
+      <BookSessionModal
+        isOpen={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+      />
     </nav>
   );
 };

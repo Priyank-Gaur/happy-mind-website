@@ -3,7 +3,7 @@ import organizationHero from "@/assets/AboutpageHERO.png";
 
 const AboutHeroSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16 bg-background">
+    <section className="py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
