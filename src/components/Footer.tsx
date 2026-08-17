@@ -8,9 +8,9 @@ const Footer = () => {
   return (
     <footer className="bg-card py-12 sm:py-16 px-4 sm:px-6 lg:px-16 border-t border-border">
       <div className="container mx-auto max-w-6xl px-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-x-4 gap-y-8 sm:gap-8 lg:gap-12 mb-8 sm:mb-12">
           {/* Brand Block */}
-          <div className="col-span-1 space-y-4">
+          <div className="col-span-2 md:col-span-1 space-y-4">
             <img src={logo} alt="HappiMynd" className="h-20 sm:h-14 w-auto" />
             <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
               A conscious growth ecosystem empowering people to become more
@@ -22,7 +22,8 @@ const Footer = () => {
             >
               info@happimynd.com
             </a>
-            <div className="flex gap-4 mt-4">
+            {/* App download buttons stay here on desktop; on mobile they move to the bottom of the footer */}
+            <div className="hidden md:flex gap-4 mt-4">
               <a
                 href="https://play.google.com/store/apps/details?id=com.happimynd"
                 target="_blank"
@@ -31,7 +32,7 @@ const Footer = () => {
                 <img
                   src={playStoreImg}
                   alt="Get it on Google Play"
-                  className="h-12 sm:h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </a>
               <a
@@ -42,7 +43,7 @@ const Footer = () => {
                 <img
                   src={appStoreImg}
                   alt="Download on the App Store"
-                  className="h-12 sm:h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </a>
             </div>
@@ -54,46 +55,52 @@ const Footer = () => {
             <ul className="space-y-2 text-muted-foreground text-xs sm:text-sm">
               <li>
                 <Link
-                  to="/v2/services/happilife"
+                  to="/v2/assessment"
                   className="hover:text-primary transition-colors"
                 >
                   HappiLIFE
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.dispatchEvent(new CustomEvent("open-contact-form"));
-                  }}
-                  className="hover:text-primary transition-colors cursor-pointer"
+                <Link
+                  to="/v2/services/happibuddy"
+                  className="hover:text-primary transition-colors"
                 >
                   HappiBUDDY
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.dispatchEvent(new CustomEvent("open-contact-form"));
-                  }}
-                  className="hover:text-primary transition-colors cursor-pointer"
+                <Link
+                  to="/v2/services/happiself"
+                  className="hover:text-primary transition-colors"
                 >
                   HappiSELF
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/v2/services/happitalk"
+                  className="hover:text-primary transition-colors"
+                >
+                  HappiTALK
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/v2/games"
+                  className="hover:text-primary transition-colors"
+                >
+                  Games
+                </Link>
               </li>
               <li>
                 <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.dispatchEvent(new CustomEvent("open-contact-form"));
-                  }}
-                  className="hover:text-primary transition-colors cursor-pointer"
+                  href="https://quizzard.happimynd.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
                 >
-                  HappiTALK
+                  Quizzard
                 </a>
               </li>
             </ul>
@@ -187,6 +194,32 @@ const Footer = () => {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* App download buttons - mobile only, shown at the bottom of the footer */}
+        <div className="flex md:hidden justify-center gap-4 mb-8">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.happimynd"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={playStoreImg}
+              alt="Get it on Google Play"
+              className="h-10 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+            />
+          </a>
+          <a
+            href="https://apps.apple.com/in/app/happimynd-emotional-self-help/id1634742782"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={appStoreImg}
+              alt="Download on the App Store"
+              className="h-10 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+            />
+          </a>
         </div>
 
         <Separator className="mb-8" />

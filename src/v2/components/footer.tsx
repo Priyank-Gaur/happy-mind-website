@@ -110,9 +110,7 @@ export function Footer() {
             </li>
             <li>
               <a
-                href="https://happimynd.com/for-organisations"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/for-organisations"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 For Organisations
@@ -154,8 +152,6 @@ export function Footer() {
             <li>
               <a
                 href="https://happimynd.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Privacy
@@ -164,8 +160,6 @@ export function Footer() {
             <li>
               <a
                 href="https://happimynd.com/terms"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Terms

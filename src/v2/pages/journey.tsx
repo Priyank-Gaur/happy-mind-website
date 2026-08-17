@@ -259,7 +259,7 @@ function ActiveServices({ matches }: { matches: (s: string) => boolean }) {
           ...list[happiLifeIndex],
           status: "Completed",
           note: "Self Check In insights ready",
-          action: "View Insights",
+          action: "View Report",
         };
       }
     }

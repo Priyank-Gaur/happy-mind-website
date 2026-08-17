@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { queryClient } from "@/v2/lib/query-client";
 
 /**
  * Lightweight client-side auth for the HappiMynd demo.
@@ -41,12 +42,23 @@ function write(user: AuthUser | null) {
 export const auth = {
   get: read,
   signIn(user: AuthUser) {
+    // Query keys like ["assessment", "checkifany"] aren't scoped per user,
+    // so any cache left over from a previous session (or a previous account
+    // on this browser) would otherwise keep showing that account's data —
+    // e.g. the HappiLIFE progress bar — until something happened to trigger
+    // a refetch. Clearing on sign-in guarantees the new session starts from
+    // a clean slate.
+    queryClient.clear();
     write(user);
   },
   signOut() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("happimynd_user_avatar_v1");
     }
+    // Same reasoning as signIn — drop every cached query immediately so a
+    // signed-out (or about-to-sign-in-as-someone-else) session never shows
+    // stale, account-specific data.
+    queryClient.clear();
     write(null);
   },
 };

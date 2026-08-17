@@ -1,7 +1,7 @@
 import { V2Link, useV2Navigate } from "@/v2/lib/router";
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, CircleCheck, ClipboardCheck, Clock, Download, ExternalLink, FileText, History, Info, LoaderCircle, Sparkles, TriangleAlert, X } from "lucide-react";
+import { ArrowLeft, CircleCheck, ClipboardCheck, Clock, Download, FileText, History, Info, LoaderCircle, Sparkles, TriangleAlert, X } from "lucide-react";
 import { Button } from "@/v2/components/ui/button";
 import { Progress } from "@/v2/components/ui/progress";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
@@ -13,7 +13,6 @@ import {
   saveOption,
   updateLastAnswer,
   completeAssessment,
-  viewReport,
   getReport,
   getAllReports,
   useAssessmentPhase,
@@ -51,16 +50,44 @@ function AssessmentPage() {
     retry: 1,
   });
 
-  // Transition once data arrives — useEffect avoids setting state during render
+  // checkifany/assessment-status only reflect the LATEST attempt — once a new
+  // attempt is started they flip back to "not completed" even though an
+  // earlier one genuinely finished. get-all-report is the real list of
+  // completed attempts, so it's the reliable "has this user ever finished
+  // one" signal for deciding whether to show the reports screen.
+  const reportsQuery = useQuery({
+    queryKey: ["assessment", "all-reports"],
+    queryFn: getAllReports,
+    enabled: appState === "checking",
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    retry: 1,
+  });
+
+  // Transition once data arrives — useEffect avoids setting state during render.
+  // If the user has completed at least one attempt ever, skip the intro modal
+  // and go straight to the reports screen (past attempts + take another) —
+  // this applies on first load, on refresh, and when navigating directly to
+  // /assessment.
   useEffect(() => {
     if (appState !== "checking") return;
-    if (checkQuery.isSuccess) {
-      setHasCompletedBefore(checkQuery.data?.data === "Yes");
-      setAppState("intro");
+    if (checkQuery.isSuccess && (reportsQuery.isSuccess || reportsQuery.isError)) {
+      const completed =
+        checkQuery.data?.data === "Yes" || (reportsQuery.data?.data?.length ?? 0) > 0;
+      setHasCompletedBefore(completed);
+      setAppState(completed ? "report" : "intro");
     } else if (checkQuery.isError) {
       setAppState("error");
     }
-  }, [appState, checkQuery.isSuccess, checkQuery.isError, checkQuery.data]);
+  }, [
+    appState,
+    checkQuery.isSuccess,
+    checkQuery.isError,
+    checkQuery.data,
+    reportsQuery.isSuccess,
+    reportsQuery.isError,
+    reportsQuery.data,
+  ]);
 
   return (
     <DashboardShell
@@ -102,7 +129,9 @@ function AssessmentPage() {
         <CompletingScreen onDone={() => setAppState("report")} />
       )}
 
-      {appState === "report" && <ReportScreen />}
+      {appState === "report" && (
+        <ReportScreen onTakeAgain={() => setAppState("in-progress")} />
+      )}
 
       {appState === "max-attempts" && <MaxAttemptsScreen />}
     </DashboardShell>
@@ -181,13 +210,13 @@ function IntroModal({
     }
     if (phase === "in-progress") {
       return {
-        h1: "Complete Your HappiLIFE Self Check In",
+        h1: "Complete Your HappiLIFE",
         body: "Understand your emotional wellbeing through a guided Self Check In designed to help you gain personalized insights.",
         primaryCta: "Continue Assessment",
       };
     }
     return {
-      h1: "Start Your HappiLIFE Self-Check-In",
+      h1: "Start Your HappiLIFE",
       body: "Gain a clearer understanding of your current patterns, strengths, and growth opportunities through a guided self-reflection experience designed to help you move forward with confidence.",
       primaryCta: "Start Assessment",
     };
@@ -273,25 +302,14 @@ function IntroModal({
           </button>
 
           {(phase === "completed" || hasCompletedBefore) ? (
-            <>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={onStart}
-                className="h-12 rounded-full border-lavender-deep/30 bg-white px-6 text-sm font-semibold text-lavender-deep hover:bg-lavender/30"
-              >
-                Retake Assessment
-              </Button>
-
-              <Button
-                size="lg"
-                onClick={onViewReport}
-                className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                View My Report
-              </Button>
-            </>
+            <Button
+              size="lg"
+              onClick={onViewReport}
+              className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              View My Report
+            </Button>
           ) : (
             <Button
               size="lg"
@@ -360,6 +378,15 @@ function InProgressFlow({
     retry: 1,
   });
 
+  // ── Skip-question validation (which unanswered question to scroll to) ────
+  const [showValidation, setShowValidation] = useState(false);
+  const questionRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Clear any "please answer this" highlighting whenever the page changes
+  useEffect(() => {
+    setShowValidation(false);
+  }, [pageData?.overview?.current_page]);
+
   // Handle max-attempts from query result
   if (pageData?.max_attempts_reached) {
     onMaxAttempts();
@@ -404,36 +431,65 @@ function InProgressFlow({
     saveMutation.mutate(optionQuestionId);
   };
 
-  // ── Determine if all visible questions are answered ───────────────────────
-  const allAnswered = questions.every(
-    (q) =>
-      localSelections[q.id] !== undefined ||
-      (q.selected_option_id !== undefined && q.selected_option_id !== null),
-  );
+  // ── Determine which visible questions are (un)answered ────────────────────
+  const isQuestionAnswered = (q: Question) =>
+    localSelections[q.id] !== undefined ||
+    (q.selected_option_id !== undefined && q.selected_option_id !== null);
+
+  const allAnswered = questions.every(isQuestionAnswered);
+  const firstUnanswered = questions.find((q) => !isQuestionAnswered(q));
 
   // ── Handle Next / Submit ──────────────────────────────────────────────────
-  const handleNext = () => {
+  // IMPORTANT: whether the assessment is "done" is decided from a FRESH
+  // server response, never from local/cumulative counts. Deciding it from
+  // overview.answered + Object.keys(localSelections).length >= overview.total
+  // (computed before ever asking the server for the next page) was the root
+  // cause of the "Submitted with no PDF" bug — that math can be wrong when
+  // the server's own total/answered drifts between calls, and it was
+  // triggering onComplete() without ever confirming there were really no
+  // questions left. Now we always fetch the next page first and only treat
+  // it as finished if that fresh fetch genuinely comes back with none.
+  const [isAdvancing, setIsAdvancing] = useState(false);
+
+  const handleNext = async () => {
     if (!overview) return;
 
-    if (
-      overview.answered + Object.keys(localSelections).length >= overview.total ||
-      overview.current_page >= lastPage
-    ) {
-      // Last page — clear persisted selections and complete
-      try { localStorage.removeItem(cacheKey); } catch { /* ignore */ }
-      onComplete();
+    // Don't allow moving forward if anything on this page is unanswered —
+    // scroll to the first unanswered question and highlight it instead.
+    if (!allAnswered) {
+      setShowValidation(true);
+      if (firstUnanswered) {
+        questionRefs.current
+          .get(firstUnanswered.id)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      toast.error("Please answer every question on this page before continuing.");
       return;
     }
 
-    // Fetch the next page (keep selections in localStorage — they carry over)
-    queryClient.invalidateQueries({ queryKey: ["assessment", "current-page"] });
-    refetch();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setIsAdvancing(true);
+    try {
+      const result = await refetch();
+      const nextQuestions = result.data?.questions ?? [];
+
+      if (nextQuestions.length === 0) {
+        // Server-confirmed: nothing left to answer. Safe to submit.
+        try { localStorage.removeItem(cacheKey); } catch { /* ignore */ }
+        onComplete();
+        return;
+      }
+
+      // More questions came back — they're already rendering from pageData.
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsAdvancing(false);
+    }
   };
 
   // ── Handle Back ──────────────────────────────────────────────────────────
   const handleBack = () => {
     if (!overview || overview.current_page <= 1) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
     const lastQuestionId = questions[questions.length - 1]?.id;
     const lastOptionId =
       localSelections[lastQuestionId] ??
@@ -443,7 +499,7 @@ function InProgressFlow({
     if (lastOptionId) {
       updateMutation.mutate(lastOptionId);
     } else {
-      queryClient.invalidateQueries({ queryKey: ["assessment", "current-page"] });
+      // Single refetch() — see note in handleNext about avoiding double calls.
       refetch();
     }
   };
@@ -464,9 +520,10 @@ function InProgressFlow({
     return <ErrorBanner message="No questions returned from the server." onRetry={() => refetch()} />;
   }
 
-  const isLastPage =
-    overview.current_page >= lastPage ||
-    overview.answered + questions.length >= overview.total;
+  // Display-only heuristic for the button label ("Next" vs "Submit"). The
+  // actual decision to submit is always server-verified in handleNext, so a
+  // wrong guess here only mislabels a button for one page, not skips work.
+  const isLastPage = overview.current_page >= lastPage;
 
   const progressPct = Math.round((overview.answered / Math.max(overview.total, 1)) * 100);
 
@@ -506,11 +563,17 @@ function InProgressFlow({
           const currentSelected =
             localSelections[q.id] ?? q.selected_option_id ?? null;
           const questionNumber = (overview.current_page - 1) * overview.perPage + idx + 1;
+          const unanswered = showValidation && !isQuestionAnswered(q);
           return (
             <QuestionCard
               key={q.id}
               index={questionNumber}
               question={q.question}
+              invalid={unanswered}
+              cardRef={(el) => {
+                if (el) questionRefs.current.set(q.id, el);
+                else questionRefs.current.delete(q.id);
+              }}
             >
               <SingleChoiceGroup
                 name={`q-${q.id}`}
@@ -539,15 +602,28 @@ function InProgressFlow({
           )}
           Back
         </Button>
-        <Button
-          onClick={handleNext}
-          disabled={!allAnswered || saveMutation.isPending}
-          size="lg"
-          className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95 disabled:opacity-50"
-        >
-          {saveMutation.isPending && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-          {isLastPage ? "Submit Self Check In" : "Next"}
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          {showValidation && !allAnswered && (
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+              <TriangleAlert className="h-3.5 w-3.5" />
+              Please answer every question to continue
+            </p>
+          )}
+          <Button
+            onClick={handleNext}
+            disabled={saveMutation.isPending || isAdvancing}
+            size="lg"
+            className={cn(
+              "h-12 rounded-full px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95 disabled:opacity-50",
+              !allAnswered && showValidation ? "bg-rose-500 hover:bg-rose-600" : "bg-gradient-brand",
+            )}
+          >
+            {(saveMutation.isPending || isAdvancing) && (
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {isLastPage ? "Submit Self Check In" : "Next"}
+          </Button>
+        </div>
       </div>
     </section>
   );
@@ -558,6 +634,7 @@ function InProgressFlow({
 // ---------------------------------------------------------------------------
 
 function CompletingScreen({ onDone }: { onDone: () => void }) {
+  const queryClient = useQueryClient();
   const completeQuery = useQuery({
     queryKey: ["assessment", "complete"],
     queryFn: completeAssessment,
@@ -566,12 +643,24 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
     staleTime: Infinity,
   });
 
-  // Transition to report state after success — useEffect avoids calling onDone during render
+  // Transition to report state after success — useEffect avoids calling onDone during render.
+  // Also invalidate every cache the dashboard/header/journey pages read completion
+  // status from, so "completed" shows up immediately instead of waiting out their
+  // staleTime — this is what was making the dashboard keep showing "Start
+  // Assessment" for a while right after a successful submission.
   useEffect(() => {
     if (completeQuery.isSuccess) {
+      queryClient.invalidateQueries({ queryKey: ["assessment", "checkifany"] });
+      queryClient.invalidateQueries({ queryKey: ["assessment", "status"] });
+      queryClient.invalidateQueries({ queryKey: ["assessment", "current-page"] });
+      // view-report is cached with staleTime: Infinity and all-reports needs
+      // to pick up the attempt that was just completed — without these, a
+      // repeat attempt would keep showing the previous attempt's report.
+      queryClient.invalidateQueries({ queryKey: ["assessment", "view-report"] });
+      queryClient.invalidateQueries({ queryKey: ["assessment", "all-reports"] });
       onDone();
     }
-  }, [completeQuery.isSuccess, onDone]);
+  }, [completeQuery.isSuccess, onDone, queryClient]);
 
   if (completeQuery.isError) {
     const msg =
@@ -594,31 +683,20 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
 // Report Screen
 // ---------------------------------------------------------------------------
 
-type ReportTab = "report" | "history";
-
-function ReportScreen() {
-  const [activeTab, setActiveTab] = useState<ReportTab>("report");
+function ReportScreen({ onTakeAgain }: { onTakeAgain: () => void }) {
   const [pdfLoading, setPdfLoading] = useState(false);
-
-  // ── view-report ───────────────────────────────────────────────────────────
-  const {
-    data: viewData,
-    isLoading: viewLoading,
-    isError: viewError,
-    error: viewErr,
-    refetch: refetchView,
-  } = useQuery({
-    queryKey: ["assessment", "view-report"],
-    queryFn: viewReport,
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-  });
-
-  const webReportUrl =
-    viewData?.url ?? viewData?.data?.url ?? null;
+  const { maxAttemptsReached, answered, total } = useAssessmentPhase();
+  // "phase" alone isn't reliable here: it reports "completed" for a freshly
+  // started retake that has 0 answers so far (it falls back to
+  // hasCompletedBefore in that case). What we actually want is "does the
+  // most recent attempt still have unanswered questions" — that's true the
+  // moment a retake is started, even before the first answer is saved.
+  const hasIncompleteAttempt = total > 0 && answered < total;
 
   // ── get-all-report ────────────────────────────────────────────────────────
+  // Always fetched (not gated behind clicking the History tab) — this list is
+  // the whole point of "past attempts + download", so it shouldn't depend on
+  // the user discovering a second tab to see it.
   const {
     data: historyData,
     isLoading: historyLoading,
@@ -630,10 +708,59 @@ function ReportScreen() {
     retry: 1,
     refetchOnWindowFocus: false,
     staleTime: 30_000,
-    enabled: activeTab === "history",
   });
 
-  const reports: ReportItem[] = historyData?.data ?? [];
+  // Defensive parsing: tolerate a few plausible response shapes for the
+  // completed-attempts list in case the real API doesn't exactly match
+  // { data: ReportItem[] } (e.g. a nested paginated resource, or a
+  // differently-named top-level key).
+  const rawHistory = historyData as unknown;
+  const reports: ReportItem[] = (() => {
+    if (Array.isArray((rawHistory as { data?: unknown })?.data)) {
+      return (rawHistory as { data: ReportItem[] }).data;
+    }
+    const nested = (rawHistory as { data?: { data?: unknown } })?.data?.data;
+    if (Array.isArray(nested)) return nested as ReportItem[];
+    const reportsKey = (rawHistory as { reports?: unknown })?.reports;
+    if (Array.isArray(reportsKey)) return reportsKey as ReportItem[];
+    if (Array.isArray(rawHistory)) return rawHistory as ReportItem[];
+    return [];
+  })();
+
+  // Figure out which row is the latest attempt by date rather than assuming
+  // the API returns them in a particular order, so the highlight is correct
+  // either way.
+  const latestReport =
+    reports.length > 0
+      ? reports.reduce((latest, r) => {
+          const rTime = new Date(r.ended_at ?? r.created_at).getTime();
+          const latestTime = new Date(latest.ended_at ?? latest.created_at).getTime();
+          return rTime > latestTime ? r : latest;
+        }, reports[0])
+      : null;
+  const latestReportId = latestReport?.id ?? null;
+  // Same field-name fallback chain as the Past Assessments list — this data
+  // source is confirmed working, unlike the separate view-report/iframe flow
+  // that used to live in "My Report" (it was unreliable and got removed).
+  const latestReportUrl = latestReport
+    ? latestReport.report_url || latestReport.url || latestReport.pdf_url ||
+      latestReport.download_url || latestReport.report || null
+    : null;
+
+  // Scroll to the "My Report" section when arriving here via a dashboard
+  // "View Report" link (those links append #latest-report to the URL).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#latest-report") return;
+    const el = document.getElementById("latest-report");
+    if (!el) return;
+    // Small delay so layout has settled before measuring scroll position.
+    const t = setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollBy(0, -100);
+    }, 150);
+    return () => clearTimeout(t);
+  }, []);
 
   // ── get-report (PDF) ──────────────────────────────────────────────────────
   const handleDownloadPdf = async () => {
@@ -661,6 +788,17 @@ function ReportScreen() {
     } finally {
       setPdfLoading(false);
     }
+  };
+
+  // Download the latest attempt's report — prefer the URL already sitting in
+  // the (working) all-reports list, only falling back to a fresh get-report
+  // call if that attempt genuinely doesn't have a link yet.
+  const handleDownloadLatest = async () => {
+    if (latestReportUrl) {
+      window.open(latestReportUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    await handleDownloadPdf();
   };
 
   return (
@@ -696,184 +834,172 @@ function ReportScreen() {
         </div>
       </div>
 
-      {/* Tab navigation */}
-      <div className="flex gap-2">
-        <button
-          onClick={() => setActiveTab("report")}
-          className={cn(
-            "flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold transition-all",
-            activeTab === "report"
-              ? "bg-gradient-brand text-white shadow-glow"
-              : "bg-white text-foreground/70 hover:bg-lavender/20",
-          )}
+      {/* Take another attempt */}
+      <div className="flex flex-col items-center justify-between gap-4 rounded-[2rem] bg-gradient-to-br from-lavender/40 to-white p-6 shadow-card sm:flex-row sm:p-8">
+        <div>
+          <h3 className="text-lg font-bold">
+            {hasIncompleteAttempt ? "You have an attempt in progress" : "Want to check in again?"}
+          </h3>
+          <p className="mt-1 text-sm text-foreground/60">
+            {maxAttemptsReached
+              ? "You've used all available attempts for the HappiLIFE Self Check In."
+              : hasIncompleteAttempt
+                ? "Pick up where you left off on your newest attempt."
+                : "Take the Self Check In again anytime to track how you've grown."}
+          </p>
+        </div>
+        <Button
+          size="lg"
+          onClick={onTakeAgain}
+          disabled={maxAttemptsReached}
+          className="h-12 shrink-0 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95 disabled:opacity-50"
         >
-          <FileText className="h-4 w-4" /> My Report
-        </button>
-        <button
-          onClick={() => setActiveTab("history")}
-          className={cn(
-            "flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold transition-all",
-            activeTab === "history"
-              ? "bg-gradient-brand text-white shadow-glow"
-              : "bg-white text-foreground/70 hover:bg-lavender/20",
-          )}
-        >
-          <History className="h-4 w-4" /> History
-        </button>
+          <Sparkles className="mr-2 h-4 w-4" />
+          {hasIncompleteAttempt ? "Continue Attempt" : "Take Another Self Check In"}
+        </Button>
       </div>
 
-      {/* Report tab */}
-      {activeTab === "report" && (
+      {/* Latest report — one clear, reliable download action. This used to
+          also show a "View Full Report" link + inline iframe sourced from a
+          separate view-report call, but that URL wasn't reliably working and
+          was just dead space — dropped in favor of reusing the same
+          confirmed-working source as the Past Assessments list below. */}
+      <div id="latest-report">
+        <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">
+          <FileText className="h-4 w-4 text-lavender-deep" /> My Report
+        </h3>
         <div className="rounded-[2rem] bg-white p-6 shadow-card sm:p-10">
-          {viewLoading && <FullPageSpinner label="Loading your report…" />}
-
-          {viewError && (
-            <ErrorBanner
-              message={
-                (viewErr instanceof Error ? viewErr.message : null) ??
-                "Could not load your report. Please try again."
-              }
-              onRetry={() => refetchView()}
-            />
-          )}
-
-          {!viewLoading && !viewError && (
-            <div className="space-y-6">
-              {webReportUrl ? (
-                <div className="space-y-4">
-                  <div className="flex flex-col items-center gap-3 sm:flex-row">
-                    <a
-                      href={webReportUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View Full Report
-                    </a>
-                    <Button
-                      onClick={handleDownloadPdf}
-                      disabled={pdfLoading}
-                      variant="outline"
-                      size="lg"
-                      className="h-12 rounded-full border-lavender-deep/30 bg-white px-7 text-sm font-semibold text-lavender-deep hover:bg-lavender/30 disabled:opacity-50"
-                    >
-                      {pdfLoading ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Generating PDF…
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download PDF
-                        </>
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Inline preview iframe */}
-                  <div className="overflow-hidden rounded-2xl border border-lavender/40 bg-lavender/10">
-                    <iframe
-                      src={webReportUrl}
-                      title="HappiLIFE Report"
-                      className="h-[600px] w-full border-0"
-                      sandbox="allow-scripts allow-same-origin allow-popups"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-4 py-12 text-center">
-                  <FileText className="h-12 w-12 text-lavender-deep/40" />
-                  <p className="text-sm text-foreground/60">
-                    Your report URL isn't available yet. Please try downloading the PDF directly.
-                  </p>
-                  <Button
-                    onClick={handleDownloadPdf}
-                    disabled={pdfLoading}
-                    className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow"
-                  >
-                    {pdfLoading ? (
-                      <>
-                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Generating PDF…
-                      </>
-                    ) : (
-                      <>
-                        <Download className="mr-2 h-4 w-4" /> Download PDF Report
-                      </>
+          {historyLoading ? (
+            <FullPageSpinner label="Loading your report…" />
+          ) : (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-lavender/30">
+                <FileText className="h-7 w-7 text-lavender-deep" />
+              </div>
+              <div>
+                <p className="text-base font-semibold">Your latest report is ready</p>
+                {latestReport && (
+                  <p className="mt-1 text-sm text-foreground/60">
+                    Completed on{" "}
+                    {new Date(latestReport.ended_at ?? latestReport.created_at).toLocaleDateString(
+                      "en-IN",
+                      { day: "numeric", month: "long", year: "numeric" },
                     )}
-                  </Button>
-                </div>
-              )}
+                  </p>
+                )}
+              </div>
+              <Button
+                onClick={handleDownloadLatest}
+                disabled={pdfLoading}
+                size="lg"
+                className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95 disabled:opacity-50"
+              >
+                {pdfLoading ? (
+                  <>
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Preparing…
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" /> Download Latest Report
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </div>
-      )}
+      </div>
 
-      {/* History tab */}
-      {activeTab === "history" && (
-        <div className="rounded-[2rem] bg-white p-6 shadow-card sm:p-10">
-          <h3 className="mb-6 text-lg font-bold">Past Assessments</h3>
+      {/* Past attempts — always visible, each with its own download link */}
+      <div className="rounded-[2rem] bg-white p-6 shadow-card sm:p-10">
+        <h3 className="mb-6 flex items-center gap-2 text-lg font-bold">
+          <History className="h-4 w-4 text-lavender-deep" /> Past Assessments
+        </h3>
 
-          {historyLoading && <FullPageSpinner label="Loading history…" />}
+        {historyLoading && <FullPageSpinner label="Loading history…" />}
 
-          {historyError && (
-            <ErrorBanner
-              message="Could not load your assessment history."
-              onRetry={() => refetchHistory()}
-            />
-          )}
+        {historyError && (
+          <ErrorBanner
+            message="Could not load your assessment history."
+            onRetry={() => refetchHistory()}
+          />
+        )}
 
-          {!historyLoading && !historyError && reports.length === 0 && (
-            <p className="text-center text-sm text-foreground/50 py-8">
-              No completed assessments on record yet.
-            </p>
-          )}
-
-          {!historyLoading && !historyError && reports.length > 0 && (
-            <ul className="space-y-3">
-              {reports.map((r, idx) => {
-                const dateStr = r.ended_at ?? r.created_at;
-                const date = dateStr ? new Date(dateStr).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }) : "—";
-                return (
-                  <li
-                    key={r.id}
-                    className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-lavender/40 bg-lavender/10 px-5 py-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-brand text-sm font-bold text-white shadow-glow">
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">Assessment #{reports.length - idx}</p>
-                        <p className="text-xs text-foreground/55">Completed on {date}</p>
-                      </div>
-                    </div>
-                    {r.report_url && (
-                      <a
-                        href={r.report_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-lavender/40 px-4 text-xs font-semibold text-lavender-deep hover:bg-lavender/60 transition"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" /> View
-                      </a>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-
-          <p className="mt-6 text-center text-xs text-foreground/40">
-            You can take the HappiLIFE Self Check In up to 6 times total.
+        {!historyLoading && !historyError && reports.length === 0 && (
+          <p className="text-center text-sm text-foreground/50 py-8">
+            No completed assessments on record yet.
           </p>
-        </div>
-      )}
+        )}
+
+        {!historyLoading && !historyError && reports.length > 0 && (
+          <ul className="space-y-3">
+            {reports.map((r, idx) => {
+              const dateStr = r.ended_at ?? r.created_at;
+              const date = dateStr ? new Date(dateStr).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }) : "—";
+              // The live API's exact field name for the per-attempt report
+              // link isn't confirmed yet, so try the plausible alternatives
+              // rather than assuming report_url is the only one that's set.
+              const downloadUrl =
+                r.report_url || r.url || r.pdf_url || r.download_url || r.report || null;
+              const isLatest = r.id === latestReportId;
+              return (
+                <li
+                  key={r.id}
+                  className={cn(
+                    "flex flex-wrap items-center justify-between gap-4 rounded-2xl border px-5 py-4 transition-all",
+                    isLatest
+                      ? "border-lavender-deep/60 bg-gradient-to-r from-lavender/30 to-lavender/10 shadow-soft"
+                      : "border-lavender/40 bg-lavender/10",
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-brand text-sm font-bold text-white shadow-glow">
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <p className="flex items-center gap-2 text-sm font-semibold">
+                        Assessment #{reports.length - idx}
+                        {isLatest && (
+                          <span className="inline-flex items-center rounded-full bg-lavender-deep px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                            Latest
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-foreground/55">Completed on {date}</p>
+                    </div>
+                  </div>
+                  {downloadUrl ? (
+                    <a
+                      href={downloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
+                        isLatest
+                          ? "bg-gradient-brand text-white shadow-glow hover:opacity-95"
+                          : "bg-lavender/40 text-lavender-deep hover:bg-lavender/60",
+                      )}
+                    >
+                      <Download className="h-3.5 w-3.5" /> Download
+                    </a>
+                  ) : (
+                    <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted px-4 text-xs font-medium text-foreground/40">
+                      Report not ready
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        <p className="mt-6 text-center text-xs text-foreground/40">
+          You can take the HappiLIFE Self Check In up to 6 times total.
+        </p>
+      </div>
 
       {/* Footer actions */}
       <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -950,17 +1076,30 @@ function QuestionCard({
   index,
   question,
   optional,
+  invalid,
+  cardRef,
   children,
 }: {
   index: number;
   question: string;
   optional?: boolean;
+  /** Highlighted as unanswered after a blocked "Next" attempt */
+  invalid?: boolean;
+  cardRef?: (el: HTMLDivElement | null) => void;
   children: ReactNode;
 }) {
   return (
-    <div className="border-b border-lavender/60 pb-8 last:border-none last:pb-0 [&+&]:pt-8">
+    <div
+      ref={cardRef}
+      className={cn(
+        "border-b border-lavender/60 pb-8 last:border-none last:pb-0 [&+&]:pt-8",
+        invalid && "rounded-2xl border border-rose-300 bg-rose-50/60 px-4 pt-4 -mx-4 sm:-mx-0",
+      )}
+    >
       <div className="flex items-baseline gap-3">
-        <span className="text-sm font-bold text-lavender-deep">Q{index}.</span>
+        <span className={cn("text-sm font-bold", invalid ? "text-rose-600" : "text-lavender-deep")}>
+          Q{index}.
+        </span>
         <h3 className="text-lg font-semibold leading-snug sm:text-xl">
           {question}
           {optional && (
@@ -968,6 +1107,12 @@ function QuestionCard({
           )}
         </h3>
       </div>
+      {invalid && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+          <TriangleAlert className="h-3.5 w-3.5" />
+          Please select an answer for this question
+        </p>
+      )}
       <div className="mt-5">{children}</div>
     </div>
   );

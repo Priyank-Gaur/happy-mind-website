@@ -442,9 +442,9 @@ function SignupPage() {
 function GetStartedStep({ onSelect }: { onSelect: (cat: Category) => void }) {
   const search = useSearch();
   const options: { value: Category; label: string; desc: string }[] = [
-    { value: "organization", label: "I am an Organization", desc: "Corporate wellness access" },
+    { value: "organization", label: "Organization Sponsored", desc: "Corporate wellness access" },
     { value: "individual", label: "Individual", desc: "Personal growth & self-reflection" },
-    { value: "school", label: "I am a School / Institution", desc: "Student & educator support" },
+    { value: "school", label: "Institution Sponsored", desc: "Student & educator support" },
   ];
 
   return (

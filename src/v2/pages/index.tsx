@@ -172,38 +172,43 @@ function HeroCarouselBox() {
 }
 
 function HeroAssessment() {
-  const { phase, progressPercent } = useAssessmentPhase();
+  const { phase, progressPercent, hasAnyCompletedReport } = useAssessmentPhase();
 
   const getContent = () => {
+    // Once the user has finished at least one attempt, always offer View
+    // Report — even if a newer retake happens to be in progress. That retake
+    // is picked up from the assessment page itself ("Take Another Self Check
+    // In"), not from this card.
+    if (hasAnyCompletedReport) {
+      return {
+        h1: "Your HappiLIFE Insights Are Ready!",
+        body: "Your self-reflection is complete. Explore your personalized growth insights and discover practical next steps to strengthen awareness, resilience, and everyday decision-making.",
+        progressLabel: "100% Completed",
+        progressValue: 100,
+        primaryCta: "View Report",
+        secondaryCta: "QUIZZARD",
+        isCompleted: true,
+      };
+    }
     switch (phase) {
-      case "not-started":
-        return {
-          h1: "Start Your HappiLIFE Self-Check-In",
-          body: "Gain a clearer understanding of your current patterns, strengths, and growth opportunities through a guided self-reflection experience designed to help you move forward with confidence.",
-          progressLabel: "Not Started",
-          progressValue: 0,
-          primaryCta: "Start Assessment",
-          secondaryCta: "Quizzard",
-          isCompleted: false,
-        };
-      case "completed":
-        return {
-          h1: "Your HappiLIFE Insights Are Ready!",
-          body: "Your self-reflection is complete. Explore your personalized growth insights and discover practical next steps to strengthen awareness, resilience, and everyday decision-making.",
-          progressLabel: "100% Completed",
-          progressValue: 100,
-          primaryCta: "View My Report",
-          secondaryCta: "QUIZZARD",
-          isCompleted: true,
-        };
       case "in-progress":
-      default:
         return {
           h1: "Complete Your HappiLIFE Self Check In",
           body: "Understand your emotional wellbeing through a guided Self Check In designed to help you gain personalized insights.",
           progressLabel: `${progressPercent}% completed`,
           progressValue: progressPercent || 65,
           primaryCta: "Continue Assessment",
+          secondaryCta: "Quizzard",
+          isCompleted: false,
+        };
+      case "not-started":
+      default:
+        return {
+          h1: "Start Your HappiLIFE Self-Check-In",
+          body: "Gain a clearer understanding of your current patterns, strengths, and growth opportunities through a guided self-reflection experience designed to help you move forward with confidence.",
+          progressLabel: "Not Started",
+          progressValue: 0,
+          primaryCta: "Start Assessment",
           secondaryCta: "Quizzard",
           isCompleted: false,
         };
@@ -220,9 +225,6 @@ function HeroAssessment() {
 
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-lavender-deep">
-            <Sparkles className="h-3.5 w-3.5" /> HappiLIFE Journey
-          </span>
           <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.5rem]">
             {content.h1}
           </h2>
@@ -245,7 +247,7 @@ function HeroAssessment() {
           </div>
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <V2Link to="/assessment">
+            <V2Link to="/assessment" hash={content.isCompleted ? "latest-report" : undefined}>
               <Button
                 size="lg"
                 className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
@@ -372,7 +374,7 @@ function QuickActions() {
 
 function ContinueJourney() {
   const [bookDialogOpen, setBookDialogOpen] = useState(false);
-  const { phase: assessmentPhase } = useAssessmentPhase();
+  const { phase: assessmentPhase, hasAnyCompletedReport } = useAssessmentPhase();
 
   // Reopen the booking dialog when the visitor returns from login mid-booking
   useEffect(() => {
@@ -380,28 +382,32 @@ function ContinueJourney() {
   }, []);
 
   const getHappiLifeCardDetails = () => {
+    // Same rule as the hero card: once at least one attempt is complete,
+    // always offer the report — a newer in-progress retake is handled on
+    // the assessment page itself, not this card.
+    if (hasAnyCompletedReport) {
+      return {
+        title: "HappiLIFE Insights Ready",
+        badge: "Completed ✓",
+        actionText: "View Report",
+        timeText: "Report available",
+      };
+    }
     switch (assessmentPhase) {
-      case "not-started":
-        return {
-          title: "Start Your HappiLIFE Self-Check-In",
-          badge: "Not Started",
-          actionText: "Start Assessment",
-          timeText: "15 min check-in",
-        };
-      case "completed":
-        return {
-          title: "HappiLIFE Insights Ready",
-          badge: "Completed ✓",
-          actionText: "View Report",
-          timeText: "Report available",
-        };
       case "in-progress":
-      default:
         return {
           title: "Finish Your HappiLIFE check-in",
           badge: "Self Check In",
           actionText: "Resume",
           timeText: "5 min left",
+        };
+      case "not-started":
+      default:
+        return {
+          title: "Start Your HappiLIFE Self-Check-In",
+          badge: "Not Started",
+          actionText: "Start Assessment",
+          timeText: "15 min check-in",
         };
     }
   };
@@ -415,6 +421,7 @@ function ContinueJourney() {
         {/* Card 1: Self Check In (First one is fine) */}
         <V2Link
           to="/assessment"
+          hash={hasAnyCompletedReport ? "latest-report" : undefined}
           className="group min-w-[260px] snap-start cursor-pointer rounded-3xl bg-white/95 p-5 shadow-soft border border-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-card flex flex-col"
         >
           <div className="relative h-32 overflow-hidden rounded-2xl bg-gradient-lavender">

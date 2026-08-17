@@ -20,7 +20,7 @@ const TrustSection = () => {
   return <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-16">
       <div className="container mx-auto max-w-5xl">
         <div className="text-center space-y-3 sm:space-y-4 mb-12 sm:mb-16">
-          <p className="text-primary font-semibold tracking-wide uppercase text-2xl sm:text-3xl md:text-4xl">Trust, Privacy & Ethics</p>
+          <p className="text-primary font-semibold tracking-wide uppercase text-xs sm:text-sm md:text-base">Trust, Privacy & Ethics</p>
           <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold text-foreground">
             Your safety is our foundation.
           </h2>

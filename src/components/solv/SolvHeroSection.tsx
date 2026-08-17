@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import heroImage from "@/assets/SOLV_heroimage.png";
 
 const pills = [
@@ -49,11 +48,13 @@ const SolvHeroSection = () => {
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4">
-              <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
-              <Button size="lg" className="rounded-full px-10">
+              <Button
+                size="lg"
+                className="rounded-full px-10"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-book-session"))}
+              >
                 Begin Your Growth Session
               </Button>
-              </Link>
             </div>
           </div>
           

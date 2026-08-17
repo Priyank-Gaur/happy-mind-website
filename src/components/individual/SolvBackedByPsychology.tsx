@@ -16,6 +16,15 @@ const frameworks = [
 const SolvBackedByPsychology = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
+
+  useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,6 +34,12 @@ const SolvBackedByPsychology = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
+
+  // Orbit radii + planet size are tuned for desktop; scale them down so
+  // orbits stay inside the section's overflow-hidden bounds on narrow screens
+  const orbitScale = viewportWidth < 400 ? 0.42 : viewportWidth < 640 ? 0.52 : viewportWidth < 1024 ? 0.75 : 1;
+  const planetSize = viewportWidth < 640 ? 56 : viewportWidth < 1024 ? 72 : 96;
+  const planetFontSize = viewportWidth < 640 ? 6 : viewportWidth < 1024 ? 7 : 9;
 
   return (
     <section ref={sectionRef} className="py-12 px-6 lg:px-16 overflow-hidden">
@@ -46,7 +61,7 @@ const SolvBackedByPsychology = () => {
 
         {/* Solar System Container */}
         <div
-          className={`relative w-full h-[400px] md:h-[500px] flex items-center justify-center transition-all duration-1000 ${
+          className={`relative w-full h-[260px] sm:h-[320px] md:h-[500px] flex items-center justify-center transition-all duration-1000 ${
             isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}
         >
@@ -55,12 +70,12 @@ const SolvBackedByPsychology = () => {
             {Array.from(new Set(frameworks.map(f => f.orbitRadius)))
               .sort((a, b) => a - b)
               .map((radius) => (
-                <div 
+                <div
                   key={radius}
                   className="absolute rounded-full border border-foreground/10"
-                  style={{ 
-                    width: `${radius * 2}px`,
-                    height: `${radius * 2}px`,
+                  style={{
+                    width: `${radius * 2 * orbitScale}px`,
+                    height: `${radius * 2 * orbitScale}px`,
                   }}
                 />
               ))
@@ -98,11 +113,13 @@ const SolvBackedByPsychology = () => {
                 }}
               >
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center p-2 text-center"
+                  className="rounded-full flex items-center justify-center p-1.5 sm:p-2 text-center"
                   style={{
+                    width: `${planetSize}px`,
+                    height: `${planetSize}px`,
                     animation: `planet-counter-${index} ${framework.speed}s linear infinite`,
                     animationDelay,
-                    background: framework.color === "primary" 
+                    background: framework.color === "primary"
                       ? "linear-gradient(to bottom right, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.3))"
                       : framework.color === "muted"
                       ? "linear-gradient(to bottom right, hsl(var(--muted) / 0.6), hsl(var(--muted) / 0.8))"
@@ -110,7 +127,10 @@ const SolvBackedByPsychology = () => {
                     boxShadow: "0 8px 25px hsl(var(--primary) / 0.15)",
                   }}
                 >
-                  <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-foreground/80 leading-tight">
+                  <span
+                    className="font-bold uppercase tracking-wide text-foreground/80 leading-tight"
+                    style={{ fontSize: `${planetFontSize}px` }}
+                  >
                     {framework.name}
                   </span>
                 </div>
@@ -123,8 +143,8 @@ const SolvBackedByPsychology = () => {
       {/* Custom Keyframes */}
       <style>{`
         ${frameworks.map((framework, index) => {
-          const radius = framework.orbitRadius;
-          
+          const radius = framework.orbitRadius * orbitScale;
+
           return `
             @keyframes planet-orbit-${index} {
               0% {
