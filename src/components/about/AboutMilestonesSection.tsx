@@ -24,13 +24,39 @@ const MilestoneCard = ({ milestone, position }: { milestone: typeof milestones[0
 
 const AboutMilestonesSection = () => {
   return (
-    <section className="py-20 px-6 lg:px-16">
+    <section className="py-12 sm:py-16 md:py-20 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-foreground text-center mb-10 sm:mb-16">
           Our Milestones
         </h2>
 
-        <div className="grid grid-cols-7 gap-0">
+        {/* Mobile / tablet: simple vertical timeline, one milestone per row */}
+        <div className="md:hidden space-y-6">
+          {milestones.map((milestone, index) => (
+            <div key={index} className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <div className="w-3.5 h-3.5 rounded-full bg-primary border-[3px] border-background shadow-[0_0_0_1px_hsl(var(--primary)/0.2)] shrink-0" />
+                {index < milestones.length - 1 && (
+                  <div className="w-0.5 flex-1 bg-primary/20 mt-1" />
+                )}
+              </div>
+              <div className="pb-2">
+                <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary font-mono text-xs font-semibold rounded-full mb-1">
+                  {milestone.year}
+                </span>
+                <h3 className="font-serif text-base font-semibold text-foreground leading-tight mb-1">
+                  {milestone.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {milestone.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: alternating top/bottom horizontal timeline */}
+        <div className="hidden md:grid md:grid-cols-7 gap-0">
           {/* Top row - odd milestones (0,2,4,6) show content, even slots empty */}
           {milestones.map((milestone, index) => (
             <div key={`top-${index}`} className="flex flex-col justify-end min-h-[120px]">

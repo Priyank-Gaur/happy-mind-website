@@ -1,5 +1,5 @@
 ﻿import { useQuery } from "@tanstack/react-query";
-import { startAssessment, checkIfAny, assessmentStatus } from "./api";
+import { startAssessment, checkIfAny, assessmentStatus, getAllReports } from "./api";
 import { auth } from "@/v2/lib/auth";
 
 export type AssessmentPhase = "not-started" | "in-progress" | "completed";
@@ -10,6 +10,17 @@ export interface AssessmentPhaseData {
   answered: number;
   total: number;
   hasCompletedBefore: boolean;
+  /**
+   * True if the user has EVER finished at least one attempt, sourced from
+   * get-all-report (a real list of completed attempts) rather than
+   * checkifany/assessment-status, which only reflect the *latest* attempt —
+   * those flip back to "not completed" as soon as a new attempt is started,
+   * which is not what "should I show View Report" should mean once retakes
+   * are allowed.
+   */
+  hasAnyCompletedReport: boolean;
+  /** True once the backend's own attempt cap (currently 6) has been hit */
+  maxAttemptsReached: boolean;
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
@@ -25,15 +36,26 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     staleTime: 1000 * 60 * 5, // 5 mins
     retry: 1,
     enabled: !!token,
+    refetchOnWindowFocus: false,
   });
 
-  // Query 2: Start / resume assessment to get total and answered question counts
+  // Query 2: Start / resume assessment to get total and answered question counts.
+  // IMPORTANT: this shares the exact same query key ("assessment","current-page")
+  // as the actual in-progress assessment flow (see assessment.tsx InProgressFlow).
+  // start-assessment is a "start OR resume" endpoint with server-side page
+  // tracking and no client-supplied cursor, so calling it independently from
+  // every page that renders the header (15+ pages via TopHeaderBar) was firing
+  // a background "resume" call on every navigation — which could shift the
+  // server's notion of "current page" out from under an active attempt.
+  // Sharing the query key means React Query dedupes/caches this across every
+  // call site instead of firing a fresh network request each time.
   const startQuery = useQuery({
-    queryKey: ["assessment", "start-assessment-phase"],
+    queryKey: ["assessment", "current-page"],
     queryFn: startAssessment,
     staleTime: 1000 * 30, // 30 seconds
     retry: 1,
     enabled: !!token,
+    refetchOnWindowFocus: false,
   });
 
   // Query 3: Assessment completion status
@@ -43,11 +65,24 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     staleTime: 1000 * 60 * 5,
     retry: 1,
     enabled: !!token,
+    refetchOnWindowFocus: false,
+  });
+
+  // Query 4: All completed reports — the authoritative "has ever completed" signal
+  const reportsQuery = useQuery({
+    queryKey: ["assessment", "all-reports"],
+    queryFn: getAllReports,
+    staleTime: 1000 * 30,
+    retry: 1,
+    enabled: !!token,
+    refetchOnWindowFocus: false,
   });
 
   const isLoading = checkQuery.isLoading || startQuery.isLoading || statusQuery.isLoading;
   const isError = checkQuery.isError && startQuery.isError;
   const hasCompletedBefore = checkQuery.data?.data === "Yes" || statusQuery.data?.completed === true;
+  const hasAnyCompletedReport =
+    (reportsQuery.data?.data?.length ?? 0) > 0 || hasCompletedBefore;
 
   const maxAttemptsReached = Boolean(startQuery.data?.max_attempts_reached);
   const overview = startQuery.data?.overview; // top-level, not under 'data'
@@ -86,6 +121,7 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     checkQuery.refetch();
     startQuery.refetch();
     statusQuery.refetch();
+    reportsQuery.refetch();
   };
 
   return {
@@ -94,6 +130,8 @@ export function useAssessmentPhase(): AssessmentPhaseData {
     answered,
     total,
     hasCompletedBefore,
+    hasAnyCompletedReport,
+    maxAttemptsReached,
     isLoading,
     isError,
     refetch,

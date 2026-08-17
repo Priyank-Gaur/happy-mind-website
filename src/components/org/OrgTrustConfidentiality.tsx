@@ -25,7 +25,7 @@ const OrgTrustConfidentiality = () => {
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <p className="text-4xl font-bold text-primary uppercase tracking-wider mb-3">
+          <p className="text-xs sm:text-sm md:text-base font-bold text-primary uppercase tracking-wider mb-3">
             Privacy, Trust & Ethics
           </p>
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-4">

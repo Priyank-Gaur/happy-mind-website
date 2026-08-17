@@ -30,14 +30,14 @@ const SolvImpactStats = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => <div key={stat.label} className={`bg-white rounded-2xl p-6 text-center space-y-2 shadow-lg hover:shadow-xl border border-border hover:border-primary/30 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          {stats.map((stat, index) => <div key={stat.label} className={`bg-white rounded-2xl p-3 sm:p-4 md:p-6 text-center space-y-2 shadow-lg hover:shadow-xl border border-border hover:border-primary/30 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{
           transitionDelay: `${0.1 + index * 0.1}s`
         }}>
-              <div className="font-serif text-3xl md:text-4xl font-semibold text-muted-foreground">
+              <div className="font-serif text-lg sm:text-2xl md:text-4xl font-semibold text-muted-foreground break-words">
                 {stat.value}
               </div>
-              <div className="text-muted-foreground text-sm">{stat.label}</div>
+              <div className="text-muted-foreground text-xs sm:text-sm">{stat.label}</div>
             </div>)}
         </div>
 

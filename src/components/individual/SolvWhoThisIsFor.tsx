@@ -23,6 +23,15 @@ const SolvWhoThisIsFor = () => {
   const [rotation, setRotation] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const animationRef = useRef<number>(0);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
+
+  useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -35,6 +44,12 @@ const SolvWhoThisIsFor = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
+
+  // Card + arc geometry scales down on narrow viewports so cards stay on screen
+  const cardWidth = viewportWidth < 480 ? 160 : viewportWidth < 640 ? 190 : viewportWidth < 1024 ? 224 : 256;
+  const cardHeight = viewportWidth < 480 ? 200 : viewportWidth < 640 ? 240 : viewportWidth < 1024 ? 280 : 320;
+  const radiusX = viewportWidth < 480 ? 90 : viewportWidth < 640 ? 130 : viewportWidth < 1024 ? 260 : 420;
+  const radiusY = viewportWidth < 640 ? 36 : 60;
 
   // Continuous rotation animation
   useEffect(() => {
@@ -62,10 +77,6 @@ const SolvWhoThisIsFor = () => {
 
     // Convert to radians for calculations
     const radians = (cardAngle * Math.PI) / 180;
-
-    // Arc parameters - creates a gentle curved path
-    const radiusX = 420; // Horizontal spread
-    const radiusY = 60; // Vertical depth of curve
 
     // Calculate position on elliptical arc
     const x = Math.sin(radians) * radiusX;
@@ -95,20 +106,20 @@ const SolvWhoThisIsFor = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-20 overflow-hidden"
+      className="relative w-full py-12 sm:py-16 md:py-20 overflow-hidden"
     >
       {/* Header */}
-      <div className="text-center mb-16 px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
+      <div className="text-center mb-10 sm:mb-16 px-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-primary">
           If You're Figuring Life Out, This Is For You.
         </h2>
-        <p className="text-lg max-w-3xl mx-auto">
+        <p className="text-base sm:text-lg max-w-3xl mx-auto">
           We support the moments that shape your direction, not just the ones that feel difficult.
         </p>
       </div>
 
       {/* Curved Carousel */}
-      <div className="relative w-full h-[400px] flex items-center justify-center">
+      <div className="relative w-full h-[260px] sm:h-[320px] md:h-[400px] flex items-center justify-center">
         {/* Center point for the carousel */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {categories.map((category, index) => {
@@ -116,13 +127,15 @@ const SolvWhoThisIsFor = () => {
             return (
               <div
                 key={index}
-                className="absolute w-64 h-80 rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
+                className="absolute rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
                 style={{
                   ...style,
                   left: '50%',
                   top: '50%',
-                  marginLeft: '-128px', // Half of width (w-64 = 256px)
-                  marginTop: '-160px', // Half of height (h-80 = 320px)
+                  width: cardWidth,
+                  height: cardHeight,
+                  marginLeft: -cardWidth / 2,
+                  marginTop: -cardHeight / 2,
                 }}
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
@@ -138,8 +151,8 @@ const SolvWhoThisIsFor = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                 {/* Title overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="text-white font-bold text-xs text-center leading-tight uppercase tracking-wide">
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
+                  <h3 className="text-white font-bold text-[10px] sm:text-xs text-center leading-tight uppercase tracking-wide">
                     {category.title}
                   </h3>
                 </div>

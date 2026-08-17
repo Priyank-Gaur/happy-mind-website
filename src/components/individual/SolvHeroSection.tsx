@@ -73,11 +73,13 @@ const SolvHeroSection = () => {
                 My Emo Snapshot
               </Button>
               </Link>
-              <Link to="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-form')); }}>
-              <Button size="lg" className="rounded-full px-8">
+              <Button
+                size="lg"
+                className="rounded-full px-8"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-book-session"))}
+              >
                 Book My SOLV Session
               </Button>
-              </Link>
             </div>
           </div>
         </div>
@@ -86,7 +88,7 @@ const SolvHeroSection = () => {
         <div className="absolute inset-0 lg:relative lg:inset-auto h-full">
           {/* Gradient overlay for text readability - only on left portion */}
           <div className="absolute inset-0 z-10 pointer-events-none lg:hidden" style={{
-          background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 30%, hsl(var(--background) / 0.7) 50%, transparent 70%)"
+          background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 45%, hsl(var(--background) / 0.85) 65%, hsl(var(--background) / 0.45) 88%, transparent 100%)"
         }} />
           <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none" style={{
           background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.8) 40%, transparent 100%)"

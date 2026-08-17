@@ -112,6 +112,12 @@ export interface ReportItem {
   created_at: string;
   /** Report URL if available */
   report_url?: string | null;
+  // The exact field name for the report link isn't confirmed against the
+  // live API yet — these are tolerated as fallbacks (see ReportScreen).
+  url?: string | null;
+  pdf_url?: string | null;
+  download_url?: string | null;
+  report?: string | null;
 }
 
 /** GET|POST /api/v1/get-all-report */

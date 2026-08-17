@@ -55,11 +55,11 @@ const OrgBusinessRealityStrip = () => {
           </div>
 
           {/* Right Side - 2x2 Tiles Grid */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {realityTiles.map((tile, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-6 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
+                className="bg-white rounded-2xl p-4 sm:p-6 border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                   <tile.icon className="w-6 h-6 text-primary" />

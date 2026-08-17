@@ -257,12 +257,16 @@ export function TopHeaderBar({
   const [bookOpen, setBookOpen] = useState(false);
   const navigate = useV2Navigate();
   const { user } = useAuth();
-  const { phase } = useAssessmentPhase();
+  const { phase, hasAnyCompletedReport } = useAssessmentPhase();
 
-  // Compute status automatically from HappiLIFE assessment phase unless overridden
+  // Compute status automatically from HappiLIFE assessment phase unless overridden.
+  // Once at least one attempt is complete, the pill stays "Active" — a newer
+  // in-progress retake doesn't flip it back to "Pending".
   let currentStatus: HeaderStatus = explicitStatus ?? "active";
   if (!explicitStatus) {
-    if (phase === "in-progress") {
+    if (hasAnyCompletedReport) {
+      currentStatus = "active";
+    } else if (phase === "in-progress") {
       currentStatus = "pending";
     } else if (phase === "not-started") {
       currentStatus = "not_given";

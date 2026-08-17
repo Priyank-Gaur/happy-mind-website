@@ -19,6 +19,13 @@ const Navbar = () => {
     if (consumeBookingResume()) setBookingOpen(true);
   }, []);
 
+  // Let other components (e.g. the SOLV page hero CTA) open the same booking dialog
+  useEffect(() => {
+    const openBooking = () => setBookingOpen(true);
+    window.addEventListener("open-book-session", openBooking);
+    return () => window.removeEventListener("open-book-session", openBooking);
+  }, []);
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-16">
@@ -49,27 +56,6 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
-            {/* Account buttons with borders */}
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="rounded-full px-4 border border-border text-foreground hover:bg-accent hover:border-primary/50 transition-all font-medium text-xs sm:text-sm"
-            >
-                  <Link to="/v2/login" onClick={() => setIsOpen(false)}>Log In</Link>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="rounded-full px-4 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-medium text-xs sm:text-sm"
-            >
-                  <Link to="/v2/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
-            </Button>
-
-            <span className="h-5 w-px bg-border" aria-hidden="true" />
-
             <div className="flex items-center gap-2">
               <Button
                 asChild
@@ -98,6 +84,27 @@ const Navbar = () => {
                 Book a Session
               </Button>
             </div>
+
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
+
+            {/* Account buttons with borders */}
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-border text-foreground hover:bg-accent hover:border-primary/50 transition-all font-medium text-xs sm:text-sm"
+            >
+                  <Link to="/v2/login" onClick={() => setIsOpen(false)}>Log In</Link>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-medium text-xs sm:text-sm"
+            >
+                  <Link to="/v2/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
