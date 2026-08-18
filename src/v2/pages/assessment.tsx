@@ -72,8 +72,18 @@ function AssessmentPage() {
   useEffect(() => {
     if (appState !== "checking") return;
     if (checkQuery.isSuccess && (reportsQuery.isSuccess || reportsQuery.isError)) {
+      const checkMessage = checkQuery.data?.message ?? checkQuery.data?.data;
+      const reportsRaw = reportsQuery.data as { data?: unknown } | undefined;
+      const reportsListLength =
+        Array.isArray(reportsRaw?.data)
+          ? reportsRaw.data.length
+          : Array.isArray(reportsQuery.data)
+          ? (reportsQuery.data as unknown[]).length
+          : 0;
+
       const completed =
-        checkQuery.data?.data === "Yes" || (reportsQuery.data?.data?.length ?? 0) > 0;
+        checkMessage === "Yes" ||
+        reportsListLength > 0;
       setHasCompletedBefore(completed);
       setAppState(completed ? "report" : "intro");
     } else if (checkQuery.isError) {
@@ -533,6 +543,10 @@ function InProgressFlow({
   }
 
   if (!overview || questions.length === 0) {
+    if (overview && overview.answered >= overview.total && overview.total > 0) {
+      onComplete();
+      return <FullPageSpinner label="Loading your completed assessment report…" />;
+    }
     return <ErrorBanner message="No questions returned from the server." onRetry={() => refetch()} />;
   }
 

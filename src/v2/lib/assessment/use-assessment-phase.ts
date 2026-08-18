@@ -1,4 +1,4 @@
-﻿import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { startAssessment, checkIfAny, assessmentStatus, getAllReports } from "./api";
 import { auth } from "@/v2/lib/auth";
 
@@ -80,9 +80,20 @@ export function useAssessmentPhase(): AssessmentPhaseData {
 
   const isLoading = checkQuery.isLoading || startQuery.isLoading || statusQuery.isLoading;
   const isError = checkQuery.isError && startQuery.isError;
-  const hasCompletedBefore = checkQuery.data?.data === "Yes" || statusQuery.data?.completed === true;
+  
+  const checkMessage = checkQuery.data?.message ?? checkQuery.data?.data;
+  const reportsRaw = reportsQuery.data as { data?: unknown } | undefined;
+  const reportsListLength =
+    Array.isArray(reportsRaw?.data)
+      ? reportsRaw.data.length
+      : Array.isArray(reportsQuery.data)
+      ? (reportsQuery.data as unknown[]).length
+      : 0;
+
+  const hasCompletedBefore =
+    checkMessage === "Yes" || statusQuery.data?.completed === true;
   const hasAnyCompletedReport =
-    (reportsQuery.data?.data?.length ?? 0) > 0 || hasCompletedBefore;
+    reportsListLength > 0 || hasCompletedBefore;
 
   const maxAttemptsReached = Boolean(startQuery.data?.max_attempts_reached);
   const overview = startQuery.data?.overview; // top-level, not under 'data'
@@ -93,24 +104,16 @@ export function useAssessmentPhase(): AssessmentPhaseData {
   let phase: AssessmentPhase = "not-started";
   let progressPercent = 0;
 
-  if (maxAttemptsReached) {
+  if (hasAnyCompletedReport || maxAttemptsReached || (answered >= total && total > 0)) {
     phase = "completed";
     progressPercent = 100;
   } else if (overview) {
     if (answered > 0 && answered < total) {
       phase = "in-progress";
       progressPercent = Math.min(99, Math.max(1, Math.round((answered / total) * 100)));
-    } else if (answered >= total && total > 0) {
-      phase = "completed";
-      progressPercent = 100;
-    } else if (answered === 0) {
-      if (hasCompletedBefore) {
-        phase = "completed";
-        progressPercent = 100;
-      } else {
-        phase = "not-started";
-        progressPercent = 0;
-      }
+    } else {
+      phase = "not-started";
+      progressPercent = 0;
     }
   } else if (hasCompletedBefore) {
     phase = "completed";
