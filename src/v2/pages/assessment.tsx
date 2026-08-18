@@ -17,7 +17,7 @@ import {
   getAllReports,
   useAssessmentPhase,
 } from "@/v2/lib/assessment";
-import type { Question, ReportItem, ApiError } from "@/v2/lib/assessment";
+import type { Question, AssessmentOverview, ReportItem, ApiError } from "@/v2/lib/assessment";
 
 export default AssessmentPage;
 // ---------------------------------------------------------------------------
@@ -129,9 +129,7 @@ function AssessmentPage() {
         <CompletingScreen onDone={() => setAppState("report")} />
       )}
 
-      {appState === "report" && (
-        <ReportScreen onTakeAgain={() => setAppState("in-progress")} />
-      )}
+      {appState === "report" && <ReportScreen />}
 
       {appState === "max-attempts" && <MaxAttemptsScreen />}
     </DashboardShell>
@@ -388,23 +386,34 @@ function InProgressFlow({
   }, [pageData?.overview?.current_page]);
 
   // Handle max-attempts from query result
-  if (pageData?.max_attempts_reached) {
-    onMaxAttempts();
-    return null;
-  }
+  useEffect(() => {
+    if (pageData?.max_attempts_reached) {
+      onMaxAttempts();
+    }
+  }, [pageData?.max_attempts_reached, onMaxAttempts]);
 
   // Sort by question ID for a deterministic, consistent page order across sessions
   const questions: Question[] = (pageData?.questions ?? []).slice().sort((a, b) => a.id - b.id);
   const overview = pageData?.overview;
+  const rawOverview = overview as (AssessmentOverview & { per_page?: number }) | undefined;
+  const perPage = Math.max(overview?.perPage ?? rawOverview?.per_page ?? questions.length ?? 5, 1);
   // last_page is not in the API response — calculate it
   const lastPage = overview
-    ? Math.ceil(overview.total / Math.max(overview.perPage, 1))
+    ? Math.ceil(overview.total / perPage)
     : 1;
 
   // ── Save option mutation ──────────────────────────────────────────────────
   const saveMutation = useMutation({
     mutationFn: saveOption,
     onError: (err) => {
+      const statusCode = (err as ApiError)?.statusCode;
+      // 419 is CSRF mismatch/session expiration on background save.
+      // Selection is recorded locally in state and localStorage, so we log a warning
+      // rather than interrupting the user with error toasts.
+      if (statusCode === 419 || (err instanceof Error && err.message.includes("419"))) {
+        console.warn("Background save-option CSRF session refresh notice (419). Answer stored locally.", err);
+        return;
+      }
       const msg =
         err instanceof Error ? err.message : "Failed to save your answer. Please try again.";
       toast.error(msg);
@@ -418,6 +427,11 @@ function InProgressFlow({
       queryClient.invalidateQueries({ queryKey: ["assessment", "current-page"] });
     },
     onError: (err) => {
+      const statusCode = (err as ApiError)?.statusCode;
+      if (statusCode === 419 || (err instanceof Error && err.message.includes("419"))) {
+        console.warn("Background update notice (419). Local state preserved.", err);
+        return;
+      }
       const msg = err instanceof Error ? err.message : "Failed to update answer.";
       toast.error(msg);
     },
@@ -504,6 +518,8 @@ function InProgressFlow({
     }
   };
 
+  if (pageData?.max_attempts_reached) return null;
+
   if (isLoading) return <FullPageSpinner label="Loading questions…" />;
 
   if (isError) {
@@ -525,7 +541,15 @@ function InProgressFlow({
   // wrong guess here only mislabels a button for one page, not skips work.
   const isLastPage = overview.current_page >= lastPage;
 
-  const progressPct = Math.round((overview.answered / Math.max(overview.total, 1)) * 100);
+  // Calculate dynamic answered count so the top header bar and question cards on screen match 100%
+  const firstQuestionNumber = (overview.current_page - 1) * perPage + 1;
+  const currentAnswersOnThisPage = questions.filter(isQuestionAnswered).length;
+  const totalAnswered = Math.min(
+    overview.total,
+    firstQuestionNumber - 1 + currentAnswersOnThisPage,
+  );
+
+  const progressPct = Math.round((totalAnswered / Math.max(overview.total, 1)) * 100);
 
   return (
     <section className="space-y-6">
@@ -542,7 +566,7 @@ function InProgressFlow({
           <div className="mt-3 flex items-end justify-between gap-4">
             <div className="text-xs font-medium text-foreground/60">
               Page {overview.current_page} of {lastPage} &nbsp;·&nbsp;{" "}
-              {overview.answered} of {overview.total} answered
+              {totalAnswered} of {overview.total} answered
             </div>
             <div className="text-xs font-semibold text-lavender-deep">{progressPct}%</div>
           </div>
@@ -553,7 +577,7 @@ function InProgressFlow({
         </div>
         <div className="flex items-center gap-2 rounded-full bg-lavender/40 px-4 py-2 text-xs font-semibold text-lavender-deep">
           <Clock className="h-3.5 w-3.5" />
-          {overview.total - overview.answered} left
+          {Math.max(0, overview.total - totalAnswered)} left
         </div>
       </div>
 
@@ -562,7 +586,7 @@ function InProgressFlow({
         {questions.map((q, idx) => {
           const currentSelected =
             localSelections[q.id] ?? q.selected_option_id ?? null;
-          const questionNumber = (overview.current_page - 1) * overview.perPage + idx + 1;
+          const questionNumber = firstQuestionNumber + idx;
           const unanswered = showValidation && !isQuestionAnswered(q);
           return (
             <QuestionCard
@@ -683,15 +707,8 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
 // Report Screen
 // ---------------------------------------------------------------------------
 
-function ReportScreen({ onTakeAgain }: { onTakeAgain: () => void }) {
+function ReportScreen() {
   const [pdfLoading, setPdfLoading] = useState(false);
-  const { maxAttemptsReached, answered, total } = useAssessmentPhase();
-  // "phase" alone isn't reliable here: it reports "completed" for a freshly
-  // started retake that has 0 answers so far (it falls back to
-  // hasCompletedBefore in that case). What we actually want is "does the
-  // most recent attempt still have unanswered questions" — that's true the
-  // moment a retake is started, even before the first answer is saved.
-  const hasIncompleteAttempt = total > 0 && answered < total;
 
   // ── get-all-report ────────────────────────────────────────────────────────
   // Always fetched (not gated behind clicking the History tab) — this list is
@@ -834,30 +851,7 @@ function ReportScreen({ onTakeAgain }: { onTakeAgain: () => void }) {
         </div>
       </div>
 
-      {/* Take another attempt */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-[2rem] bg-gradient-to-br from-lavender/40 to-white p-6 shadow-card sm:flex-row sm:p-8">
-        <div>
-          <h3 className="text-lg font-bold">
-            {hasIncompleteAttempt ? "You have an attempt in progress" : "Want to check in again?"}
-          </h3>
-          <p className="mt-1 text-sm text-foreground/60">
-            {maxAttemptsReached
-              ? "You've used all available attempts for the HappiLIFE Self Check In."
-              : hasIncompleteAttempt
-                ? "Pick up where you left off on your newest attempt."
-                : "Take the Self Check In again anytime to track how you've grown."}
-          </p>
-        </div>
-        <Button
-          size="lg"
-          onClick={onTakeAgain}
-          disabled={maxAttemptsReached}
-          className="h-12 shrink-0 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95 disabled:opacity-50"
-        >
-          <Sparkles className="mr-2 h-4 w-4" />
-          {hasIncompleteAttempt ? "Continue Attempt" : "Take Another Self Check In"}
-        </Button>
-      </div>
+
 
       {/* Latest report — one clear, reliable download action. This used to
           also show a "View Full Report" link + inline iframe sourced from a

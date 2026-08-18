@@ -28,14 +28,16 @@ function readCookie(name: string): string | null {
 
 let lastAcquireAt = 0;
 
-export async function acquireCsrfToken(baseUrl: string): Promise<string | null> {
-  const existing = readCookie("XSRF-TOKEN");
-  if (existing) return existing;
+export async function acquireCsrfToken(baseUrl: string, forceFresh = false): Promise<string | null> {
+  if (!forceFresh) {
+    const existing = readCookie("XSRF-TOKEN");
+    if (existing) return existing;
+  }
 
-  if (Date.now() - lastAcquireAt < 3000) return null;
+  if (Date.now() - lastAcquireAt < 3000) return readCookie("XSRF-TOKEN");
   lastAcquireAt = Date.now();
 
-  const endpoints = ["/sanctum/csrf-cookie", "/api/v1/csrf-cookie"];
+  const endpoints = ["/sanctum/csrf-cookie", "/api/v1/csrf-cookie", "/csrf-cookie"];
   for (const ep of endpoints) {
     try {
       await fetch(`${baseUrl}${ep}`, {
@@ -62,7 +64,8 @@ export async function fetchWithCsrf(
   const res = await fetch(url, init);
   if (res.status !== 419) return res;
 
-  const token = await acquireCsrfToken(baseUrl);
+  // Force acquire a fresh CSRF cookie on 419 token mismatch
+  const token = await acquireCsrfToken(baseUrl, true);
   if (!token) return res;
 
   try {
