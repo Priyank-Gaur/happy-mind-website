@@ -265,6 +265,32 @@ export type RaiseQueryPayload = {
   query: string;
 };
 
+// Coupon
+export type ApplyCouponPayload = {
+  plan_id: number;
+  coupon: string;
+};
+
+export type ApplyCouponResponse = {
+  status: string;
+  message: string;
+  data?: {
+    coupon_id: number;
+    plan_id: number;
+    discount: number;
+  };
+};
+
+export type AvailFreeServicePayload = {
+  plan_id: number;
+  coupen_id?: number;
+};
+
+export type AvailFreeServiceResponse = {
+  status: string;
+  message: string;
+};
+
 export type ContactPayload = {
   first_name: string;
   last_name: string;
@@ -466,4 +492,35 @@ export async function fetchUserProfileList(): Promise<UserProfileItem[]> {
   const raw = await apiGet<unknown>("/api/v1/user-profile");
   const data = (raw as any)?.data ?? raw;
   return Array.isArray(data) ? data : [];
+}
+
+/**
+ * POST /api/v1/apply-coupon 🔒
+ * Validate a coupon code for a given plan. Returns discount percentage.
+ */
+export async function applyCoupon(
+  payload: ApplyCouponPayload,
+  token: string,
+): Promise<ApplyCouponResponse> {
+  const raw = await apiPost<unknown>("/api/v1/apply-coupon", {
+    plan_id: payload.plan_id,
+    coupon: payload.coupon,
+  }, token);
+  return raw as ApplyCouponResponse;
+}
+
+/**
+ * POST /api/v1/avail-free-services 🔒
+ * Activate a subscription directly without Razorpay (for 100% discount coupons).
+ * Creates BundleStatus + CouponReceipt on the backend.
+ */
+export async function availFreeService(
+  payload: AvailFreeServicePayload,
+  token: string,
+): Promise<AvailFreeServiceResponse> {
+  const raw = await apiPost<unknown>("/api/v1/avail-free-services", {
+    plan_id: payload.plan_id,
+    coupen_id: payload.coupen_id ?? 0,
+  }, token);
+  return raw as AvailFreeServiceResponse;
 }

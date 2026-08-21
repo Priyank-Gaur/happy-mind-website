@@ -60,6 +60,8 @@ export interface CheckIfAnyResponse {
 export interface StartAssessmentResponse {
   /** Present when user has hit the 6-attempt cap */
   max_attempts_reached?: boolean;
+  /** Present when user completed within the last minute — server blocks new attempts temporarily */
+  recently_completed?: boolean;
   message?: string;
   status?: string | number;
   /** Questions for the current page */
@@ -74,7 +76,8 @@ export interface SaveOptionRequest {
 
 /** GET|POST /api/v1/save-option — response */
 export interface SaveOptionResponse {
-  message?: string;
+  /** `true` for normal saves, `"completed"` (string) when this was the last question */
+  message?: string | boolean;
   status?: number;
 }
 

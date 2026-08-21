@@ -18,6 +18,9 @@ import {
   useAssessmentPhase,
 } from "@/v2/lib/assessment";
 import type { Question, AssessmentOverview, ReportItem, ApiError } from "@/v2/lib/assessment";
+import { fetchSubscribedServices } from "@/v2/lib/website-api";
+import { useAuth } from "@/v2/lib/auth";
+import { CouponPurchaseDialog } from "@/v2/components/coupon-purchase-dialog";
 
 export default AssessmentPage;
 // ---------------------------------------------------------------------------
@@ -39,6 +42,7 @@ function AssessmentPage() {
   useProtectedRoute("Please log in to take the assessment.");
   const [appState, setAppState] = useState<AppState>("checking");
   const [hasCompletedBefore, setHasCompletedBefore] = useState(false);
+  const queryClient = useQueryClient();
 
   // ── checkifany on mount ──────────────────────────────────────────────────
   const checkQuery = useQuery({
@@ -99,6 +103,26 @@ function AssessmentPage() {
     reportsQuery.data,
   ]);
 
+  const handleRetake = async () => {
+    // Clear any persisted selections from the previous attempt so the new
+    // attempt starts with a clean slate.
+    try {
+      const raw = localStorage.getItem("happimynd_auth_v1");
+      const token = raw ? (JSON.parse(raw)?.token as string | undefined) : undefined;
+      const key = token ? `happi_assessment_sel_${token.slice(-12)}` : "happi_assessment_sel";
+      localStorage.removeItem(key);
+    } catch { /* ignore */ }
+    // REMOVE (not just invalidate) both current-page and all-reports caches so
+    // InProgressFlow doesn't briefly serve stale completed data while refetching.
+    // all-reports must also be removed so that when the user eventually
+    // completes the retake and lands on ReportScreen, it fetches a fresh list
+    // instead of briefly showing the stale empty array from the initial load.
+    queryClient.removeQueries({ queryKey: ["assessment", "current-page"] });
+    queryClient.removeQueries({ queryKey: ["assessment", "all-reports"] });
+    await queryClient.invalidateQueries({ queryKey: ["assessment"] });
+    setAppState("in-progress");
+  };
+
   return (
     <DashboardShell
       header={
@@ -139,7 +163,7 @@ function AssessmentPage() {
         <CompletingScreen onDone={() => setAppState("report")} />
       )}
 
-      {appState === "report" && <ReportScreen />}
+      {appState === "report" && <ReportScreen onRetake={handleRetake} />}
 
       {appState === "max-attempts" && <MaxAttemptsScreen />}
     </DashboardShell>
@@ -396,25 +420,123 @@ function InProgressFlow({
   }, [pageData?.overview?.current_page]);
 
   // Handle max-attempts from query result
+  // API may return status: "true" (string) or max_attempts_reached: true (boolean)
+  const isMaxAttempts =
+    pageData?.max_attempts_reached === true ||
+    pageData?.status === "true";
+
   useEffect(() => {
-    if (pageData?.max_attempts_reached) {
+    if (isMaxAttempts) {
       onMaxAttempts();
     }
-  }, [pageData?.max_attempts_reached, onMaxAttempts]);
+  }, [isMaxAttempts, onMaxAttempts]);
+
+  // Detect cooldown / empty response from the API.
+  // The server returns no questions/overview in two cases:
+  //   1. User completed within the last minute (cooldown) — message says "recently completed"
+  //   2. Some other server-side issue returning an empty payload
+  // We treat ANY response with no questions + no overview + not max-attempts as a
+  // cooldown/empty state and show a retry screen instead of the harsh error banner.
+  const isEmptyResponse =
+    !pageData?.questions?.length &&
+    !pageData?.overview &&
+    !isMaxAttempts;
+
+  // ── Cooldown timer (timestamp-based, never resets mid-countdown) ─────────
+  // cooldownEndAt is set ONCE when a cooldown response first arrives and
+  // never touched again — this prevents the bug where useEffect re-running
+  // (e.g. from a background query refetch) would call setCooldownSeconds(60)
+  // and restart the countdown from 60.
+  const cooldownEndAtRef = useRef<number>(0);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+
+  // When we first detect a cooldown (empty response), stamp the end time.
+  useEffect(() => {
+    if (!isEmptyResponse) return;
+    // Only stamp once per cooldown session — if the ref is already set and
+    // still in the future, don't overwrite it.
+    if (cooldownEndAtRef.current > Date.now()) return;
+    cooldownEndAtRef.current = Date.now() + 60_000;
+    setCooldownSeconds(60);
+  }, [isEmptyResponse]);
+
+  // Countdown tick — runs every second while a cooldown is active.
+  // Clears itself when the cooldown expires. Never touches cooldownEndAtRef.
+  useEffect(() => {
+    if (!isEmptyResponse || cooldownEndAtRef.current === 0) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((cooldownEndAtRef.current - Date.now()) / 1000));
+      setCooldownSeconds(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+      }
+    };
+    tick(); // immediate first tick
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [isEmptyResponse]);
+
+  // Auto-retry when cooldown expires — keeps polling until the server
+  // returns actual questions (not another cooldown response).
+  useEffect(() => {
+    if (!isEmptyResponse || cooldownSeconds > 0) return;
+    // Cooldown expired but still no questions — retry every 3 seconds
+    // until the server is ready (max 10 retries before giving up).
+    let retries = 0;
+    const maxRetries = 10;
+    const poll = () => {
+      if (retries >= maxRetries) return;
+      retries++;
+      refetch();
+    };
+    poll(); // immediate first attempt
+    const interval = setInterval(poll, 3000);
+    return () => clearInterval(interval);
+  }, [isEmptyResponse, cooldownSeconds, refetch]);
 
   // Sort by question ID for a deterministic, consistent page order across sessions
   const questions: Question[] = (pageData?.questions ?? []).slice().sort((a, b) => a.id - b.id);
   const overview = pageData?.overview;
   const rawOverview = overview as (AssessmentOverview & { per_page?: number }) | undefined;
-  const perPage = Math.max(overview?.perPage ?? rawOverview?.per_page ?? questions.length ?? 5, 1);
+  // Lock in the per-page count from the first fetched page so that lastPage
+  // stays consistent even when the final page has fewer items.
+  const firstPageCountRef = useRef<number>(0);
+  if (firstPageCountRef.current === 0 && questions.length > 0) {
+    firstPageCountRef.current = questions.length;
+  }
+  const perPage = Math.max(
+    overview?.perPage ?? rawOverview?.per_page ?? firstPageCountRef.current ?? 5,
+    1,
+  );
+
+  // The API's overview.total can fluctuate between pages (e.g. returns 115 on
+  // page 1 but 93 on page 10). Track the highest total ever seen so that
+  // lastPage never shrinks mid-assessment — a shrinking lastPage is what
+  // causes the "Submit" button to appear prematurely.
+  const maxTotalRef = useRef<number>(0);
+  if (overview && overview.total > maxTotalRef.current) {
+    maxTotalRef.current = overview.total;
+  }
+  const canonicalTotal = Math.max(maxTotalRef.current, overview?.total ?? 0);
+
   // last_page is not in the API response — calculate it
-  const lastPage = overview
-    ? Math.ceil(overview.total / perPage)
+  const lastPage = canonicalTotal > 0
+    ? Math.ceil(canonicalTotal / perPage)
     : 1;
 
   // ── Save option mutation ──────────────────────────────────────────────────
   const saveMutation = useMutation({
     mutationFn: saveOption,
+    onSuccess: (data) => {
+      // API returns message: "completed" (string) when the last answer is saved.
+      // We intentionally do NOT auto-complete here — the answer is saved on the
+      // server, but the user must click the Submit button to finalize.
+      // This avoids the jarring experience of the assessment auto-submitting
+      // the instant they select the last option.
+      if (data?.message === "completed") {
+        toast.success("All questions answered — click Submit to finish.");
+      }
+    },
     onError: (err) => {
       const statusCode = (err as ApiError)?.statusCode;
       // 419 is CSRF mismatch/session expiration on background save.
@@ -497,7 +619,22 @@ function InProgressFlow({
       const nextQuestions = result.data?.questions ?? [];
 
       if (nextQuestions.length === 0) {
-        // Server-confirmed: nothing left to answer. Safe to submit.
+        // Server-confirmed: nothing left to answer. Safe to submit — but
+        // first verify the server's own counters agree. If the API returns
+        // zero questions while overview.answered < overview.total, something
+        // is wrong on the server side and we should NOT silently submit an
+        // incomplete assessment.
+        const freshOverview = result.data?.overview;
+        if (
+          freshOverview &&
+          freshOverview.total > 0 &&
+          freshOverview.answered < freshOverview.total
+        ) {
+          toast.error(
+            `The server returned no more questions but shows ${freshOverview.answered} of ${freshOverview.total} answered. Please try again.`,
+          );
+          return;
+        }
         try { localStorage.removeItem(cacheKey); } catch { /* ignore */ }
         onComplete();
         return;
@@ -528,7 +665,57 @@ function InProgressFlow({
     }
   };
 
-  if (pageData?.max_attempts_reached) return null;
+  if (isMaxAttempts) return null;
+
+  // Cooldown screen: the server blocks new attempts for 1 minute after completion.
+  // Show a countdown and auto-retry when it expires.
+  if (isEmptyResponse) {
+    return (
+      <section className="mx-auto max-w-2xl text-center">
+        <div className="rounded-[2rem] bg-white p-8 shadow-card sm:p-14">
+          <div className="relative mx-auto grid h-28 w-28 place-items-center">
+            <div className="absolute inset-0 rounded-full bg-lavender/40 blur-2xl" />
+            <div className="relative grid h-24 w-24 place-items-center rounded-full bg-lavender text-lavender-deep shadow-soft">
+              <Clock className="h-12 w-12" strokeWidth={2} />
+            </div>
+          </div>
+
+          <h2 className="mt-8 text-3xl font-bold tracking-tight sm:text-4xl">
+            Getting Your Next Assessment Ready
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-foreground/70 sm:text-base">
+            You just completed an assessment. Please wait a moment before starting a new one.
+          </p>
+
+          {cooldownSeconds > 0 && (
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-lavender/30 px-5 py-2.5 text-sm font-semibold text-lavender-deep">
+              <LoaderCircle className="h-4 w-4 animate-spin" />
+              Starting in {cooldownSeconds}s…
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              onClick={() => refetch()}
+              size="lg"
+              className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
+            >
+              {cooldownSeconds > 0 ? "Try Now" : "Start Assessment"}
+            </Button>
+            <V2Link to="/">
+              <Button
+                size="lg"
+                variant="ghost"
+                className="h-12 rounded-full px-7 text-sm font-semibold text-foreground/60 hover:bg-lavender/30"
+              >
+                Return to Dashboard
+              </Button>
+            </V2Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) return <FullPageSpinner label="Loading questions…" />;
 
@@ -543,7 +730,7 @@ function InProgressFlow({
   }
 
   if (!overview || questions.length === 0) {
-    if (overview && overview.answered >= overview.total && overview.total > 0) {
+    if (overview && overview.answered >= canonicalTotal && canonicalTotal > 0) {
       onComplete();
       return <FullPageSpinner label="Loading your completed assessment report…" />;
     }
@@ -559,11 +746,11 @@ function InProgressFlow({
   const firstQuestionNumber = (overview.current_page - 1) * perPage + 1;
   const currentAnswersOnThisPage = questions.filter(isQuestionAnswered).length;
   const totalAnswered = Math.min(
-    overview.total,
+    canonicalTotal,
     firstQuestionNumber - 1 + currentAnswersOnThisPage,
   );
 
-  const progressPct = Math.round((totalAnswered / Math.max(overview.total, 1)) * 100);
+  const progressPct = Math.round((totalAnswered / Math.max(canonicalTotal, 1)) * 100);
 
   return (
     <section className="space-y-6">
@@ -580,7 +767,7 @@ function InProgressFlow({
           <div className="mt-3 flex items-end justify-between gap-4">
             <div className="text-xs font-medium text-foreground/60">
               Page {overview.current_page} of {lastPage} &nbsp;·&nbsp;{" "}
-              {totalAnswered} of {overview.total} answered
+              {totalAnswered} of {canonicalTotal} answered
             </div>
             <div className="text-xs font-semibold text-lavender-deep">{progressPct}%</div>
           </div>
@@ -591,7 +778,7 @@ function InProgressFlow({
         </div>
         <div className="flex items-center gap-2 rounded-full bg-lavender/40 px-4 py-2 text-xs font-semibold text-lavender-deep">
           <Clock className="h-3.5 w-3.5" />
-          {Math.max(0, overview.total - totalAnswered)} left
+          {Math.max(0, canonicalTotal - totalAnswered)} left
         </div>
       </div>
 
@@ -678,7 +865,12 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
     queryFn: completeAssessment,
     retry: 1,
     refetchOnWindowFocus: false,
-    staleTime: Infinity,
+    // staleTime: 0 — MUST re-fire every time CompletingScreen mounts.
+    // Previous value was Infinity, which meant on retakes the cached success
+    // from attempt 1 was reused without actually calling complete-assessment
+    // on the server. The server never marked attempt 2 as completed, so
+    // get-all-report only returned 1 attempt.
+    staleTime: 0,
   });
 
   // Transition to report state after success — useEffect avoids calling onDone during render.
@@ -694,8 +886,13 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
       // view-report is cached with staleTime: Infinity and all-reports needs
       // to pick up the attempt that was just completed — without these, a
       // repeat attempt would keep showing the previous attempt's report.
+      // IMPORTANT: removeQueries (not invalidateQueries) for all-reports so
+      // that ReportScreen doesn't briefly serve the stale empty array from the
+      // initial checking phase. removeQueries wipes the cache entry → ReportScreen
+      // sees isLoading: true → shows spinner → fresh fetch returns actual reports.
+      queryClient.removeQueries({ queryKey: ["assessment", "all-reports"] });
       queryClient.invalidateQueries({ queryKey: ["assessment", "view-report"] });
-      queryClient.invalidateQueries({ queryKey: ["assessment", "all-reports"] });
+      try { localStorage.setItem("happi_assessment_completed_at", String(Date.now())); } catch { /* ignore */ }
       onDone();
     }
   }, [completeQuery.isSuccess, onDone, queryClient]);
@@ -721,8 +918,57 @@ function CompletingScreen({ onDone }: { onDone: () => void }) {
 // Report Screen
 // ---------------------------------------------------------------------------
 
-function ReportScreen() {
+function ReportScreen({ onRetake }: { onRetake: () => void }) {
   const [pdfLoading, setPdfLoading] = useState(false);
+  const { user } = useAuth();
+
+  // ── Subscription check — only subscribed users can download PDFs ─────────
+  const [hasActiveBundle, setHasActiveBundle] = useState<boolean | null>(null);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user?.token) {
+      setHasActiveBundle(false);
+      return;
+    }
+    fetchSubscribedServices(user.token)
+      .then((data) => {
+        const has = data.packages?.some(
+          (p) => p.is_subscribed && p.plans?.some((pl) => pl.is_subscribed),
+        ) ?? false;
+        setHasActiveBundle(has);
+      })
+      .catch(() => setHasActiveBundle(false));
+  }, [user?.token]);
+
+  // ── Retake cooldown (server requires 1-minute gap between attempts) ──────
+  const COOLDOWN_MS = 60_000;
+  const completedAt = (() => {
+    try {
+      const ts = localStorage.getItem("happi_assessment_completed_at");
+      return ts ? Number(ts) : 0;
+    } catch { return 0; }
+  })();
+
+  const [cooldownRemaining, setCooldownRemaining] = useState(() =>
+    Math.max(0, Math.ceil((completedAt + COOLDOWN_MS - Date.now()) / 1000)),
+  );
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const interval = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownRemaining > 0]);
+
+  const canRetakeNow = cooldownRemaining <= 0;
 
   // ── get-all-report ────────────────────────────────────────────────────────
   // Always fetched (not gated behind clicking the History tab) — this list is
@@ -757,6 +1003,13 @@ function ReportScreen() {
     if (Array.isArray(rawHistory)) return rawHistory as ReportItem[];
     return [];
   })();
+
+  // Debug: log the raw API response and parsed reports to help diagnose
+  // the "only 1 of 2 attempts shows" issue.
+  if (historyData) {
+    console.log("[ReportScreen] all-reports raw:", JSON.stringify(historyData, null, 2));
+    console.log("[ReportScreen] parsed reports count:", reports.length, reports.map(r => ({ id: r.id, ended_at: r.ended_at })));
+  }
 
   // Figure out which row is the latest attempt by date rather than assuming
   // the API returns them in a particular order, so the highlight is correct
@@ -795,12 +1048,18 @@ function ReportScreen() {
 
   // ── get-report (PDF) ──────────────────────────────────────────────────────
   const handleDownloadPdf = async () => {
+    if (!hasActiveBundle) {
+      setPurchaseDialogOpen(true);
+      return;
+    }
     setPdfLoading(true);
     try {
       const resp = await getReport();
       const url = resp.url ?? resp.data?.url;
-      if (!url) throw new Error("No download URL returned.");
-      // Trigger download
+      if (!url) {
+        toast.error("Report not available yet. Please try again in a moment.");
+        return;
+      }
       const a = document.createElement("a");
       a.href = url;
       a.download = "happilife-report.pdf";
@@ -867,18 +1126,34 @@ function ReportScreen() {
 
 
 
-      {/* Latest report — one clear, reliable download action. This used to
-          also show a "View Full Report" link + inline iframe sourced from a
-          separate view-report call, but that URL wasn't reliably working and
-          was just dead space — dropped in favor of reusing the same
-          confirmed-working source as the Past Assessments list below. */}
+      {/* Latest report — one clear, reliable download action. */}
       <div id="latest-report">
         <h3 className="mb-3 flex items-center gap-2 text-lg font-bold">
           <FileText className="h-4 w-4 text-lavender-deep" /> My Report
         </h3>
         <div className="rounded-[2rem] bg-white p-6 shadow-card sm:p-10">
-          {historyLoading ? (
+          {historyLoading || hasActiveBundle === null ? (
             <FullPageSpinner label="Loading your report…" />
+          ) : !hasActiveBundle ? (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <div className="grid h-16 w-16 place-items-center rounded-full bg-amber-100">
+                <FileText className="h-7 w-7 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-base font-semibold">Subscribe to download your report</p>
+                <p className="mt-1 max-w-sm text-sm text-foreground/60">
+                  Get the SELF STARTER plan to unlock your personalized PDF report
+                  with detailed insights and growth recommendations.
+                </p>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => setPurchaseDialogOpen(true)}
+                className="h-12 rounded-full bg-gradient-brand px-7 text-sm font-semibold text-white shadow-glow transition hover:opacity-95"
+              >
+                <Sparkles className="mr-2 h-4 w-4" /> Unlock Report — ₹199
+              </Button>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-4 py-6 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-full bg-lavender/30">
@@ -980,23 +1255,35 @@ function ReportScreen() {
                     </div>
                   </div>
                   {downloadUrl ? (
-                    <a
-                      href={downloadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
-                        isLatest
-                          ? "bg-gradient-brand text-white shadow-glow hover:opacity-95"
-                          : "bg-lavender/40 text-lavender-deep hover:bg-lavender/60",
-                      )}
-                    >
-                      <Download className="h-3.5 w-3.5" /> Download
-                    </a>
+                    hasActiveBundle ? (
+                      <a
+                        href={downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
+                          isLatest
+                            ? "bg-gradient-brand text-white shadow-glow hover:opacity-95"
+                            : "bg-lavender/40 text-lavender-deep hover:bg-lavender/60",
+                        )}
+                      >
+                        <Download className="h-3.5 w-3.5" /> Download
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => setPurchaseDialogOpen(true)}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-amber-50 px-4 text-xs font-medium text-amber-700 border border-amber-200 hover:bg-amber-100 transition cursor-pointer"
+                      >
+                        Subscribe to unlock
+                      </button>
+                    )
                   ) : (
-                    <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-muted px-4 text-xs font-medium text-foreground/40">
-                      Report not ready
-                    </span>
+                    <button
+                      onClick={() => setPurchaseDialogOpen(true)}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-amber-50 px-4 text-xs font-medium text-amber-700 border border-amber-200 hover:bg-amber-100 transition cursor-pointer"
+                    >
+                      Subscribe to unlock
+                    </button>
                   )}
                 </li>
               );
@@ -1008,6 +1295,29 @@ function ReportScreen() {
           You can take the HappiLIFE Self Check In up to 6 times total.
         </p>
       </div>
+
+      {/* Retake */}
+      {reports.length < 6 && (
+        <div className="flex flex-col items-center gap-2">
+          <Button
+            onClick={onRetake}
+            disabled={!canRetakeNow}
+            size="lg"
+            variant="outline"
+            className="h-12 rounded-full border-lavender-deep/30 bg-white px-7 text-sm font-semibold text-lavender-deep hover:bg-lavender/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ClipboardCheck className="mr-2 h-4 w-4" />
+            {canRetakeNow
+              ? "Take Another Assessment"
+              : `Available in ${cooldownRemaining}s`}
+          </Button>
+          {!canRetakeNow && (
+            <p className="text-xs text-foreground/50">
+              You can start a new assessment 1 minute after completing one.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Footer actions */}
       <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -1034,6 +1344,15 @@ function ReportScreen() {
         <ClipboardCheck className="h-3.5 w-3.5" />
         HappiLIFE Self Check In • Completed
       </div>
+
+      <CouponPurchaseDialog
+        open={purchaseDialogOpen}
+        onOpenChange={setPurchaseDialogOpen}
+        planId={1}
+        planName="SELF STARTER"
+        planPrice={199}
+        onSuccess={() => setHasActiveBundle(true)}
+      />
     </section>
   );
 }
