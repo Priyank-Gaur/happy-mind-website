@@ -403,7 +403,7 @@ export async function payForBundle(
 ): Promise<PaymentLinkResponse> {
   const raw = await apiPost<unknown>("/api/v1/payment", {
     plan_id: payload.plan_id,
-    amount: payload.amount,
+    amount: Math.round(payload.amount * 1.18),
     coupen_id: payload.coupen_id ?? 0,
   }, token);
   return raw as PaymentLinkResponse;
@@ -422,7 +422,7 @@ export async function payForHappiTalk(
   const raw = await apiPost<unknown>("/api/v1/payment-for-happitalk", {
     psychologist_id: payload.psychologist_id,
     plan_id: payload.plan_id,
-    amount: payload.amount,
+    amount: Math.round(payload.amount * 1.18),
     date: payload.date,
     time: payload.time,
     session: payload.session,
@@ -444,7 +444,7 @@ export async function payForHappiGuide(
 ): Promise<PaymentLinkResponse> {
   const raw = await apiPost<unknown>("/api/v1/payment-for-happiguide", {
     plan_id: payload.plan_id,
-    amount: payload.amount,
+    amount: Math.round(payload.amount * 1.18),
     date: payload.date,
     time: payload.time,
     coupen_id: payload.coupen_id ?? 0,
