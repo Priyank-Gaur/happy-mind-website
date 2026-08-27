@@ -1,6 +1,6 @@
 import { useV2Navigate } from "@/v2/lib/router";
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Sparkles, Phone, LifeBuoy, Check, ShieldCheck, Award, Users, Star, TrendingUp, Repeat, HeartHandshake, UserCog, Lock, Info, EyeOff, BadgeCheck, ChevronLeft, ChevronRight, ArrowLeft, Smartphone, Download, Quote } from "lucide-react";
 import { DashboardShell, TopHeaderBar } from "@/v2/components/dashboard-shell";
 import { Button } from "@/v2/components/ui/button";
@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
 import { consumeBookingResume } from "@/v2/lib/bookings";
 import { getCatalog } from "@/v2/data/service-catalog";
-import { payForBundle } from "@/v2/lib/website-api";
+import { payForBundle, fetchPackages, type Package } from "@/v2/lib/website-api";
 import { auth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 import viewPlansHeroImg from "@/v2/assets/view-plans-mascot.png";
@@ -58,6 +58,7 @@ export default SharedPricingPage;
 
 type Plan = {
   id: string;
+  planId: number;
   name: string;
   price: number;
   /** Original price, shown struck through next to the selling price. */
@@ -72,6 +73,7 @@ type Plan = {
 const PLANS: Plan[] = [
   {
     id: "starter",
+    planId: 35,
     name: "SELF STARTER",
     price: 199,
     billing: "1 Month",
@@ -80,6 +82,7 @@ const PLANS: Plan[] = [
   },
   {
     id: "plus",
+    planId: 36,
     name: "BUDDY",
     price: 399,
     billing: "1 Month",
@@ -88,6 +91,7 @@ const PLANS: Plan[] = [
   },
   {
     id: "q",
+    planId: 37,
     name: "BUDDY PLUS",
     price: 799,
     billing: "3 Months",
@@ -96,6 +100,7 @@ const PLANS: Plan[] = [
   },
   {
     id: "qplus",
+    planId: 38,
     name: "CARE 3X",
     price: 1499,
     billing: "3 Months",
@@ -104,6 +109,7 @@ const PLANS: Plan[] = [
   },
   {
     id: "half",
+    planId: 39,
     name: "CARE 6X",
     price: 2499,
     mrp: 2999,
@@ -113,6 +119,7 @@ const PLANS: Plan[] = [
   },
   {
     id: "annual",
+    planId: 40,
     name: "CARE 12X",
     price: 8999,
     mrp: 17999,
@@ -470,6 +477,8 @@ function ComparePlansSection({
   );
 }
 
+const GROWTH_PACKAGE_IDS = new Set([17, 18, 19, 20, 21, 22]);
+
 function SharedPricingPage() {
   const navigate = useV2Navigate();
   const { slug } = useParams();
@@ -477,6 +486,50 @@ function SharedPricingPage() {
   const [isReviewPaused, setIsReviewPaused] = useState(false);
   const [whyPageIndex, setWhyPageIndex] = useState(0);
   const [isWhyPaused, setIsWhyPaused] = useState(false);
+  const [apiPackages, setApiPackages] = useState<Package[]>([]);
+
+  // Fetch growth packages dynamically from GET /api/v1/packages
+  useEffect(() => {
+    fetchPackages().then((pkgs) => {
+      if (pkgs && pkgs.length > 0) setApiPackages(pkgs);
+    }).catch(() => {});
+  }, []);
+
+const VALIDITY_MAP: Record<number, string> = {
+  17: "1 Month",
+  18: "1 Month",
+  19: "3 Months",
+  20: "3 Months",
+  21: "6 Months",
+  22: "12 Months",
+};
+
+  const dynamicPlans: Plan[] = useMemo(() => {
+    const growth = apiPackages.filter((pkg) => GROWTH_PACKAGE_IDS.has(pkg.id));
+    if (growth.length === 0) return PLANS;
+    return growth.map((pkg) => {
+      const plan = pkg.plans?.[0];
+      const sellingPrice = plan?.selling_price ?? plan?.price ?? 0;
+      const mrp = plan?.price && plan.price > sellingPrice ? plan.price : undefined;
+      const rawDuration = plan?.duration?.name;
+      const durationName = (rawDuration && rawDuration !== "Onetime pay")
+        ? rawDuration
+        : (VALIDITY_MAP[pkg.id] ?? "1 Month");
+      const isBestValue = pkg.name.toUpperCase().includes("12X");
+      return {
+        id: String(pkg.id),
+        planId: plan?.id ?? 12,
+        name: pkg.name,
+        price: sellingPrice,
+        mrp,
+        billing: durationName,
+        who: pkg.description || "Growth plan",
+        value: pkg.description || "Growth plan",
+        highlight: isBestValue,
+        badge: isBestValue ? "Best Value" : undefined,
+      };
+    });
+  }, [apiPackages]);
 
   // Unified Booking Flow dialog state
   const [bookOpen, setBookOpen] = useState(false);
@@ -548,7 +601,7 @@ function SharedPricingPage() {
       return;
     }
     const catalog = getCatalog(slug);
-    const planId = parseInt(p.id, 10) || 12;
+    const planId = p.planId ?? (parseInt(p.id, 10) || 12);
     const token = auth.get()?.token;
 
     try {
@@ -785,7 +838,7 @@ function SharedPricingPage() {
       </section>
 
       {/* SECTION 5 — Compare Plans */}
-      <ComparePlansSection plans={PLANS} onBuy={buyPlan} />
+      <ComparePlansSection plans={dynamicPlans} onBuy={buyPlan} />
 
       {/* SECTION 6 — Why choose HappiMynd */}
       <section
