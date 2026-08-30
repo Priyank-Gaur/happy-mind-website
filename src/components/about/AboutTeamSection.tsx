@@ -1,4 +1,6 @@
-import { User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, User } from "lucide-react";
+import { fetchPsychologists } from "@/v2/lib/website-api";
 import amitRathiImage from "@/assets/team/1630081769-amit_rathi.png";
 import raviKantImage from "@/assets/team/1630082349-ravi_kant.png";
 import neerajTripathiImage from "@/assets/team/1630092178-neeraj_tripathi.png";
@@ -22,6 +24,8 @@ import harmeenDhillonImage from "@/assets/team/harmeen-dhillon.png";
 import juhiPandeyImage from "@/assets/team/juhi-pandey.jpeg";
 import vSubhashiniImage from "@/assets/team/v-subhashini.png";
 import tavishiChaudharyImage from "@/assets/team/tavishi-chaudhary.jpeg";
+import priyanshiGargImage from "@/assets/team/priyanshi-garg.jpeg";
+import shraddhaYadavImage from "@/assets/team/shraddha-yadav.png";
 
 type TeamMember = {
   name: string;
@@ -213,7 +217,154 @@ const leadingPsychologists: GrowthCoach[] = [
   },
 ];
 
+// Full expert roster (name + role). Experts already featured under
+// Leading Psychologists are excluded automatically below, so this list
+// can be extended freely without creating duplicates.
+const expertRoster: { name: string; role: string; image?: string }[] = [
+  { name: "Sanika Dharaskar", role: "Clinical Psychologist" },
+  { name: "Kiran Makhijani", role: "Clinical Psychologist" },
+  { name: "Vidyalakshmi", role: "Counselling Psychologist" },
+  { name: "Geetika Arora", role: "Clinical Psychologist" },
+  { name: "Payel Chakraborty", role: "Clinical Psychologist" },
+  { name: "Khyati Malik", role: "Clinical Psychologist" },
+  { name: "Ketaki Gokhale", role: "Clinical Psychologist" },
+  { name: "Sakshi Jain", role: "Clinical Psychologist" },
+  { name: "Sukanya Biswas", role: "Clinical Psychologist" },
+  { name: "Pooja Deoke", role: "Clinical Psychologist" },
+  { name: "Bivek Pradhan", role: "Counselling Psychologist" },
+  { name: "Sarah Ralte", role: "Clinical Psychologist" },
+  { name: "Bhavika Mulani", role: "Counselling Psychologist" },
+  { name: "Shaily Bhushan", role: "Counselling Psychologist" },
+  { name: "Kusuma Harish", role: "Counselling Psychologist" },
+  { name: "Jeena Girilal", role: "Clinical Psychologist" },
+  { name: "Dr. Satnam Singh Deol", role: "Clinical Psychologist" },
+  { name: "Rida E Noor", role: "Clinical Psychologist" },
+  { name: "Nidhi Singh", role: "Clinical Psychologist" },
+  { name: "Dr. Harmeen Dhillon", role: "Counselling Psychologist" },
+  { name: "Mayura Paranjpe", role: "Clinical Psychologist" },
+  { name: "Abhilasha Agarwal", role: "Clinical Psychologist" },
+  { name: "Sana Abdullah", role: "Counselling Psychologist" },
+  { name: "Veena Mehta", role: "Clinical Psychologist" },
+  { name: "Naina Seth", role: "Clinical Psychologist" },
+  { name: "Khushboo Shah", role: "Counselling Psychologist" },
+  { name: "Nitya Bajoriya", role: "Clinical Psychologist" },
+  { name: "Manasi Kulkarni", role: "Clinical Psychologist" },
+  { name: "Shriya Sachdeva", role: "Counselling Psychologist" },
+  { name: "Dr. Tazveen Shaikh", role: "Clinical Psychologist" },
+  { name: "Dr. Aparna Das", role: "Counselling Psychologist" },
+  { name: "Dr. Pratibha Sharma", role: "Clinical Psychologist" },
+  { name: "Nikhila Nikhil Kothari", role: "Counselling Psychologist" },
+  { name: "Arpita Roy", role: "Clinical Psychologist" },
+  { name: "Nagavelly Vinay Kumar", role: "Counselling Psychologist" },
+  { name: "Vanshika Agarwal", role: "Counselling Psychologist" },
+  { name: "Tavishi Chaudhary", role: "Counselling Psychologist" },
+  { name: "Shraddha Yadav", role: "Counselling Psychologist", image: shraddhaYadavImage },
+  { name: "Juhi Pandey", role: "Counselling Psychologist" },
+  { name: "V. Subhashini", role: "Counselling Psychologist" },
+  { name: "Priyanshi Garg", role: "Clinical Psychologist", image: priyanshiGargImage },
+  { name: "Samanvithaa Adiseshan", role: "Clinical Psychologist" },
+  { name: "Sukhmani Bhatia", role: "Counselling Psychologist" },
+  { name: "Tamanna Borah", role: "Clinical Psychologist" },
+  { name: "Shreeyam Pareek", role: "Counselling Psychologist" },
+  { name: "Lavanya Anand", role: "Counselling Psychologist" },
+  { name: "Anushka Chauhan", role: "Counselling Psychologist" },
+  { name: "Sadhana Sharma", role: "Counselling Psychologist" },
+  { name: "Kunjalika Tikku", role: "Counselling Psychologist" },
+  { name: "Divya Mishra", role: "Counselling Psychologist" },
+  { name: "Shreya Chaudhary", role: "Counselling Psychologist" },
+  { name: "Gamini Arya", role: "Counselling Psychologist" },
+  { name: "Tamheed Azeem", role: "Counselling Psychologist" },
+  { name: "Simran Patel", role: "Clinical Psychologist" },
+  { name: "Sonal Rajput", role: "Counselling Psychologist" },
+  { name: "Manubha Sharma", role: "Counselling Psychologist" },
+  { name: "Naman Ratra", role: "Counselling Psychologist" },
+  { name: "Arpita Dethe", role: "Counselling Psychologist" },
+  { name: "Smriti Bhardwaj", role: "Counselling Psychologist" },
+  { name: "Joshitha Cheppalli", role: "Counselling Psychologist" },
+  { name: "Dr. Medha Narayan Kulshreshtha", role: "Counselling Psychologist" },
+  { name: "Astha Borbora", role: "Clinical Psychologist" },
+  { name: "Ishika Aggarwal", role: "Counselling Psychologist" },
+  { name: "Bhavana B", role: "Counselling Psychologist" },
+];
+
+// Loose match so punctuation/spacing differences (e.g. "Dr.Harmeen Dhillon"
+// vs "Dr. Harmeen Dhillon") still count as the same person.
+const normalizeName = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+type Expert = {
+  name: string;
+  role: string;
+  image?: string;
+};
+
+const buildExperts = (
+  roster: { name: string; role: string; image?: string }[],
+  exclude: { name: string }[]
+): Expert[] => {
+  const excludedNames = new Set(exclude.map((member) => normalizeName(member.name)));
+  return roster.filter((member) => !excludedNames.has(normalizeName(member.name)));
+};
+
+// Experts = full roster minus anyone already featured under Leading
+// Psychologists. Extend `expertRoster` above and this list stays in sync.
+const experts: Expert[] = buildExperts(expertRoster, leadingPsychologists);
+
+// Fuzzy match against the live psychologist directory (same source the
+// "/experts" panel uses), tolerant of minor spelling/initial differences
+// between this roster and the directory's records.
+const nameWords = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/^dr\s+/, "")
+    .split(/\s+/)
+    .filter((word) => word.length > 1);
+
+const namesLooselyMatch = (a: string, b: string) => {
+  const wordsA = nameWords(a);
+  const wordsB = nameWords(b);
+  if (wordsA.length === 0 || wordsB.length === 0) return false;
+  if (wordsA.join(" ") === wordsB.join(" ")) return true;
+
+  const lastA = wordsA[wordsA.length - 1];
+  const lastB = wordsB[wordsB.length - 1];
+  const lastMatches =
+    lastA === lastB ||
+    (Math.abs(lastA.length - lastB.length) <= 2 && lastA.slice(0, 4) === lastB.slice(0, 4));
+
+  return wordsA[0] === wordsB[0] && lastMatches;
+};
+
 const AboutTeamSection = () => {
+  const [showExperts, setShowExperts] = useState(false);
+  const [expertPhotos, setExpertPhotos] = useState<{ name: string; url: string }[]>([]);
+  const hasFetchedPhotos = useRef(false);
+
+  useEffect(() => {
+    if (!showExperts || hasFetchedPhotos.current) return;
+    hasFetchedPhotos.current = true;
+
+    fetchPsychologists({ limit: 100 })
+      .then(({ psychologists }) => {
+        setExpertPhotos(
+          psychologists
+            .filter((p) => p.full_name && p.profile_picture_url)
+            .map((p) => ({ name: p.full_name, url: p.profile_picture_url as string }))
+        );
+      })
+      .catch(() => {
+        // Directory unreachable — cards keep their placeholder icon.
+      });
+  }, [showExperts]);
+
+  const resolveExpertImage = (expert: Expert) =>
+    expert.image ?? expertPhotos.find((p) => namesLooselyMatch(expert.name, p.name))?.url;
+
   return (
     <section id="our-team" className="py-24 px-6 lg:px-16">
       <div className="container mx-auto max-w-6xl">
@@ -386,6 +537,76 @@ const AboutTeamSection = () => {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* See More / See Less toggle */}
+        <div className="text-center mt-16">
+          <button
+            type="button"
+            onClick={() => setShowExperts((prev) => !prev)}
+            aria-expanded={showExperts}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-primary/30 text-primary text-sm font-medium hover:bg-primary/5 hover:border-primary/50 transition-all duration-300"
+          >
+            {showExperts ? "See Less" : `See More Experts (${experts.length})`}
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-300 ${
+                showExperts ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Collapsed by default; "See More" reveals the Experts heading + grid */}
+        <div
+          className={`grid transition-all duration-500 ease-in-out ${
+            showExperts ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            {/* Subtitle: Experts (continuation of Leading Psychologists) */}
+            <div className="text-center mb-10 mt-16">
+              <h4 className="font-serif text-xl md:text-2xl font-semibold text-foreground">
+                Experts
+              </h4>
+              <span className="mt-3 block h-0.5 w-12 mx-auto rounded-full bg-primary/30" />
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-8 max-w-6xl mx-auto pb-2">
+              {experts.map((expert, index) => {
+                const photo = resolveExpertImage(expert);
+                return (
+                <div
+                  key={index}
+                  className="text-center group transition-transform duration-300 hover:-translate-y-1"
+                >
+                  {/* Photo Container */}
+                  <div className="relative mb-3 mx-auto w-20 h-20 md:w-24 md:h-24">
+                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/40 transition-all duration-300 shadow-sm group-hover:shadow-md bg-primary/5 flex items-center justify-center">
+                      {photo ? (
+                        <img
+                          src={photo}
+                          alt={expert.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-1/2 h-1/2 text-primary/30" strokeWidth={1.5} />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <h5 className="font-serif text-sm md:text-base font-semibold text-foreground mb-0.5 leading-tight">
+                    {expert.name}
+                  </h5>
+                  <p className="text-primary text-xs md:text-sm font-medium">
+                    {expert.role}
+                  </p>
+                </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </section>
