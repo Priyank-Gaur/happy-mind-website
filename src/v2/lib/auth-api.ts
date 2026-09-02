@@ -105,11 +105,11 @@ export type SignUpPayload = {
   nickname: string;
   user_profile_id: number;   // 1–10, maps to PROFILE_TYPES
   age: number;
-  gender: string;            // "male" | "female" | "non-binary" | "prefer-not"
+  gender: string;            // "male" | "female" | "other"
   username: string;
   password: string;
   confirm_password: string;
-  signup_type: string;       // "individual" | "organisation"
+  signup_type: string;       // "individual" | "organization"
   country_code: string;      // "91"
   mobile: string;            // 10-digit
   language: number;          // 1 = English
