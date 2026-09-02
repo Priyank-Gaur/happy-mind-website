@@ -37,6 +37,7 @@ import {
 import { useUserProfile } from "@/v2/hooks/use-user-profile";
 import { type Psychologist } from "@/v2/data/psychologists";
 import { payForHappiTalk, payForHappiGuide } from "@/v2/lib/website-api";
+import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { cart } from "@/v2/lib/cart-store";
 import { auth } from "@/v2/lib/auth";
 import { checkAuthOrRedirect } from "@/v2/lib/auth-guard";
@@ -126,6 +127,19 @@ export function BookSessionDialog({
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{ transactionId?: string } | null>(null);
 
+  // Breakdown modal state
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [breakdownData, setBreakdownData] = useState<{
+    itemName: string;
+    itemDescription: string;
+    basePrice: number;
+    planId: number;
+    isHappiTalk: boolean;
+    psychologistId?: number;
+    dateStr: string;
+    timeStr: string;
+  } | null>(null);
+
   // Reset/sync dialog state whenever opened
   useEffect(() => {
     if (open) {
@@ -163,10 +177,10 @@ export function BookSessionDialog({
 
   const validateSlots = (): boolean => {
     const next: SlotErrors = {};
-    if (!date1) next.date1 = "Please select Preferred Date 1.";
-    if (!slot1) next.slot1 = "Please select Preferred Time Slot 1.";
-    if (!date2) next.date2 = "Please select Preferred Date 2.";
-    if (!slot2) next.slot2 = "Please select Preferred Time Slot 2.";
+    if (!date1) next.date1 = "Select first date";
+    if (!slot1) next.slot1 = "Select first slot";
+    if (!date2) next.date2 = "Select second date";
+    if (!slot2) next.slot2 = "Select second slot";
 
     if (
       date1 &&
@@ -176,7 +190,7 @@ export function BookSessionDialog({
       isSameDay(date1, date2) &&
       slot1 === slot2
     ) {
-      next.slot2 = "Preferred Slot 2 must be different from Preferred Slot 1.";
+      next.slot2 = "Pick a different time slot for the second preference";
     }
 
     setSlotErrors(next);
@@ -223,43 +237,63 @@ export function BookSessionDialog({
     }
 
     // Direct API hit & payment order generation (SOLV via payForHappiGuide or HappiTALK via payForHappiTalk)
-    setSubmittingPayment(true);
-    const token = auth.get()?.token;
     const formattedDate = format(date1, "yyyy-MM-dd");
     const slotTimeStr = slot1; // e.g. "10:00 AM - 11:00 AM"
+
+    const planId = isHappiTalk && selectedPsychologist
+      ? Number(service?.plan?.id ?? 21)
+      : Number(service?.plan?.id ?? 8);
+    const amount = isHappiTalk && selectedPsychologist
+      ? Number(service?.plan?.price ?? selectedPsychologist.startingFrom ?? 800)
+      : Number(service?.plan?.price ?? 599);
+    const itemName = isHappiTalk && selectedPsychologist
+      ? `HappiTALK - Session with ${selectedPsychologist.name}`
+      : `HappiGUIDE - Growth Consultation`;
+
+    setBreakdownData({
+      itemName,
+      itemDescription: `Slot: ${format(date1, "MMM d, yyyy")} (${slot1})`,
+      basePrice: amount,
+      planId,
+      isHappiTalk: Boolean(isHappiTalk && selectedPsychologist),
+      psychologistId: selectedPsychologist ? Number(selectedPsychologist.id) : undefined,
+      dateStr: formattedDate,
+      timeStr: slotTimeStr,
+    });
+    setBreakdownOpen(true);
+  };
+
+  const handleConfirmBookingPayment = async (couponId?: number) => {
+    if (!breakdownData || !date1 || !date2 || !slot1 || !slot2) return;
+    setSubmittingPayment(true);
+    const token = auth.get()?.token;
 
     try {
       let res: { link: string } | null = null;
 
-      if (isHappiTalk && selectedPsychologist) {
-        const planId = Number(service?.plan?.id ?? 21);
-        const amount = Number(service?.plan?.price ?? selectedPsychologist.startingFrom ?? 800);
-
+      if (breakdownData.isHappiTalk && breakdownData.psychologistId) {
         res = await payForHappiTalk(
           {
-            psychologist_id: Number(selectedPsychologist.id),
-            plan_id: planId,
-            amount,
-            date: formattedDate,
-            time: slotTimeStr,
+            psychologist_id: breakdownData.psychologistId,
+            plan_id: breakdownData.planId,
+            amount: breakdownData.basePrice,
+            date: breakdownData.dateStr,
+            time: breakdownData.timeStr,
             session: 1,
             user_recording_permission: 1,
-            coupen_id: 0,
+            coupen_id: couponId ?? 0,
           },
           token,
         );
       } else {
         // SOLV -> HappiGuide payment
-        const planId = Number(service?.plan?.id ?? 8);
-        const amount = Number(service?.plan?.price ?? 599);
-
         res = await payForHappiGuide(
           {
-            plan_id: planId,
-            amount,
-            date: formattedDate,
-            time: slotTimeStr,
-            coupen_id: 0,
+            plan_id: breakdownData.planId,
+            amount: breakdownData.basePrice,
+            date: breakdownData.dateStr,
+            time: breakdownData.timeStr,
+            coupen_id: couponId ?? 0,
           },
           token,
         );
@@ -273,10 +307,13 @@ export function BookSessionDialog({
         return;
       } else {
         toast.success(`Booking Confirmed for ${activeService.name}!`);
+        setBreakdownOpen(false);
       }
     } catch (err: any) {
       console.warn("Direct booking API notice:", err);
       toast.error(err?.message ?? `Failed to initiate booking for ${activeService.name}`);
+    } finally {
+      setSubmittingPayment(false);
     }
 
     bookings.add({
@@ -285,14 +322,14 @@ export function BookSessionDialog({
       name: profile.name,
       email: profile.email,
       phone: profile.phone,
-      date: formattedDate,
+      date: breakdownData.dateStr,
       slot: slot1,
       date2: format(date2, "yyyy-MM-dd"),
       slot2: slot2,
     });
 
     const orderId = "HM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    const purchased = `${activeService.name} Session (${formattedDate} @ ${slot1})`;
+    const purchased = `${activeService.name} Session (${breakdownData.dateStr} @ ${slot1})`;
     const plan = activeService.name;
 
     cart.clear();
@@ -530,6 +567,19 @@ export function BookSessionDialog({
           )}
         </div>
       </DialogContent>
+
+      {breakdownData && (
+        <PaymentBreakdownModal
+          open={breakdownOpen}
+          onOpenChange={setBreakdownOpen}
+          itemName={breakdownData.itemName}
+          itemDescription={breakdownData.itemDescription}
+          basePrice={breakdownData.basePrice}
+          planId={breakdownData.planId}
+          onConfirmPayment={handleConfirmBookingPayment}
+          isLoading={submittingPayment}
+        />
+      )}
     </Dialog>
   );
 }

@@ -145,6 +145,18 @@ export function CouponPurchaseDialog({
     handlePay();
   };
 
+  const isValidating = step === "validating";
+  const isProcessing = step === "processing";
+
+  const handleRemoveCoupon = () => {
+    setDiscount(0);
+    setCouponId(null);
+    setCouponCode("");
+    setFinalAmount(planPrice);
+    setStep("idle");
+    setCouponError("");
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
@@ -172,71 +184,106 @@ export function CouponPurchaseDialog({
               </DialogDescription>
             </DialogHeader>
 
-            {/* Plan summary */}
-            <div className="rounded-2xl bg-lavender/20 p-4">
-              <div className="flex items-center justify-between">
+            {/* Plan summary & GST breakdown */}
+            <div className="rounded-2xl border border-border/60 bg-lavender/10 p-4 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-border/40">
                 <div>
-                  <p className="text-sm font-bold">{planName}</p>
+                  <p className="text-sm font-bold text-foreground">{planName}</p>
                   <p className="text-xs text-foreground/50">1 Month Access</p>
                 </div>
                 <div className="text-right">
-                  {discount > 0 && discount < 100 ? (
-                    <>
-                      <p className="text-xs text-foreground/40 line-through">
-                        ₹{planPrice.toLocaleString("en-IN")}
-                      </p>
-                      <p className="text-lg font-extrabold text-lavender-deep">
-                        ₹{finalAmount.toLocaleString("en-IN")}
-                      </p>
-                    </>
-                  ) : discount === 100 ? (
-                    <p className="text-lg font-extrabold text-emerald-600">FREE</p>
-                  ) : (
-                    <p className="text-lg font-extrabold text-lavender-deep">
-                      ₹{planPrice.toLocaleString("en-IN")}
-                    </p>
-                  )}
+                  <span className="text-xs text-muted-foreground block">Base Price</span>
+                  <span className="text-sm font-bold text-foreground">
+                    ₹{planPrice.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
-              {discount > 0 && discount < 100 && (
-                <p className="mt-2 text-xs font-semibold text-emerald-600">
-                  <Tag className="mr-1 inline h-3 w-3" />
-                  {discount}% discount applied
-                </p>
+
+              {/* Line items */}
+              {discount === 100 ? (
+                <div className="flex justify-between items-center text-sm font-bold text-emerald-600 pt-1">
+                  <span>Total Amount</span>
+                  <span>FREE (100% Discount)</span>
+                </div>
+              ) : (
+                <div className="space-y-1.5 text-xs">
+                  {discount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Tag className="h-3 w-3" /> Coupon Discount ({discount}%)
+                      </span>
+                      <span>- ₹{(planPrice - finalAmount).toLocaleString("en-IN")}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-foreground/80">
+                    <span>Subtotal</span>
+                    <span className="font-medium">₹{finalAmount.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between text-foreground/80">
+                    <span className="flex items-center gap-1">
+                      GST (18%)
+                    </span>
+                    <span className="font-medium">+ ₹{Math.round(finalAmount * 0.18).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="border-t border-border/60 pt-2 flex justify-between items-baseline font-bold">
+                    <span className="text-sm text-foreground">Total Payable</span>
+                    <span className="text-base text-lavender-deep">
+                      ₹{Math.round(finalAmount * 1.18).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Coupon input */}
-            {step === "idle" && (
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter coupon code"
-                    value={couponCode}
-                    onChange={(e) => {
-                      setCouponCode(e.target.value.toUpperCase());
-                      setCouponError("");
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
-                    disabled={step === "validating"}
-                    className="flex-1 uppercase tracking-wider"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={handleApplyCoupon}
-                    disabled={!couponCode.trim() || step === "validating"}
-                    className="shrink-0 cursor-pointer"
-                  >
-                    Apply
-                  </Button>
-                </div>
-                {couponError && (
-                  <p className="text-xs font-medium text-rose-600">{couponError}</p>
+            {/* Coupon input or applied badge */}
+            {!isValidating && (
+              <div className="space-y-2">
+                {discount > 0 ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                    <div className="flex items-center gap-2 text-emerald-700 font-semibold">
+                      <Tag className="h-4 w-4" />
+                      <span>{couponCode || "COUPON"} Applied ({discount}% off)</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-xs text-rose-600 font-medium hover:underline cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(e.target.value.toUpperCase());
+                          setCouponError("");
+                        }}
+                        onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+                        disabled={isValidating || isProcessing}
+                        className="flex-1 uppercase tracking-wider text-xs h-10"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleApplyCoupon}
+                        disabled={!couponCode.trim() || isValidating || isProcessing}
+                        className="shrink-0 cursor-pointer h-10 text-xs"
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs font-medium text-rose-600">{couponError}</p>
+                    )}
+                  </div>
                 )}
               </div>
             )}
 
-            {step === "validating" && (
+            {isValidating && (
               <div className="flex items-center justify-center gap-2 py-2 text-sm text-foreground/60">
                 <LoaderCircle className="h-4 w-4 animate-spin" />
                 Validating coupon…
@@ -244,15 +291,15 @@ export function CouponPurchaseDialog({
             )}
 
             {/* Actions */}
-            {step !== "validating" && (
+            {!isValidating && (
               <div className="space-y-2">
                 {discount === 100 ? (
                   <Button
                     onClick={handlePay}
-                    disabled={step === "processing"}
+                    disabled={isProcessing}
                     className="w-full h-11 rounded-2xl bg-gradient-brand text-sm font-semibold text-white shadow-glow hover:opacity-95 cursor-pointer"
                   >
-                    {step === "processing" ? (
+                    {isProcessing ? (
                       <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       <>
@@ -263,21 +310,21 @@ export function CouponPurchaseDialog({
                 ) : (
                   <Button
                     onClick={handlePay}
-                    disabled={step === "processing"}
+                    disabled={isProcessing}
                     className="w-full h-11 rounded-2xl bg-gradient-brand text-sm font-semibold text-white shadow-glow hover:opacity-95 cursor-pointer"
                   >
-                    {step === "processing" ? (
+                    {isProcessing ? (
                       <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       <>
-                        Pay ₹{finalAmount.toLocaleString("en-IN")}{" "}
+                        Proceed to Pay ₹{Math.round(finalAmount * 1.18).toLocaleString("en-IN")}{" "}
                         <ArrowRight className="ml-1.5 h-4 w-4" />
                       </>
                     )}
                   </Button>
                 )}
 
-                {step === "idle" && !couponCode.trim() && (
+                {discount === 0 && !couponCode.trim() && (
                   <p className="text-center text-xs text-foreground/40">
                     Have a coupon? Enter it above before paying.
                   </p>

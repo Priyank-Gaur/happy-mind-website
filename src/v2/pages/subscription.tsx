@@ -19,6 +19,8 @@ export default SubscriptionPage;
 
 import { useProtectedRoute, checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 
+import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
+
 function SubscriptionPage() {
   const navigate = useV2Navigate();
   const { user } = useAuth();
@@ -29,6 +31,10 @@ function SubscriptionPage() {
   const [apiPackages, setApiPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<number | null>(null);
+
+  // Payment breakdown modal state
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [selectedPkg, setSelectedPkg] = useState<Package | null>(null);
 
   useEffect(() => {
     if (user?.token) {
@@ -47,25 +53,34 @@ function SubscriptionPage() {
     }
   }, [user?.token]);
 
-  const handleBuyPackage = async (pkg: Package) => {
+  const handleBuyPackage = (pkg: Package) => {
     if (!checkAuthOrRedirect(navigate, "/subscription", "Please log in to purchase a plan.")) {
       return;
     }
-    const token = auth.get()?.token;
     const firstPlan = pkg.plans?.[0];
     if (!firstPlan) {
       toast.error("Selected plan details not found");
       return;
     }
 
-    setBuyingId(pkg.id);
+    setSelectedPkg(pkg);
+    setBreakdownOpen(true);
+  };
+
+  const handleExecutePayment = async (couponId?: number) => {
+    if (!selectedPkg) return;
+    const token = auth.get()?.token;
+    const firstPlan = selectedPkg.plans?.[0];
+    if (!firstPlan) return;
+
+    setBuyingId(selectedPkg.id);
 
     try {
       const res = await payForBundle(
         {
           plan_id: firstPlan.id,
           amount: firstPlan.selling_price ?? firstPlan.price,
-          coupen_id: 0,
+          coupen_id: couponId ?? 0,
         },
         token,
       );
@@ -77,11 +92,12 @@ function SubscriptionPage() {
         window.location.href = res.link;
         return;
       } else {
-        toast.success(`Purchased ${pkg.name}!`);
+        toast.success(`Purchased ${selectedPkg.name}!`);
+        setBreakdownOpen(false);
       }
     } catch (err: any) {
       console.warn("Plan purchase API notice:", err);
-      toast.error(err?.message ?? `Failed to initiate payment for ${pkg.name}`);
+      toast.error(err?.message ?? `Failed to initiate payment for ${selectedPkg.name}`);
     } finally {
       setBuyingId(null);
     }
@@ -231,6 +247,19 @@ function SubscriptionPage() {
           )}
         </section>
       </div>
+
+      {selectedPkg && (
+        <PaymentBreakdownModal
+          open={breakdownOpen}
+          onOpenChange={setBreakdownOpen}
+          itemName={selectedPkg.name}
+          itemDescription={selectedPkg.description || `${selectedPkg.name} Access Plan`}
+          basePrice={selectedPkg.plans?.[0]?.selling_price ?? selectedPkg.plans?.[0]?.price ?? 0}
+          planId={selectedPkg.plans?.[0]?.id}
+          onConfirmPayment={handleExecutePayment}
+          isLoading={buyingId === selectedPkg.id}
+        />
+      )}
     </DashboardShell>
   );
 }

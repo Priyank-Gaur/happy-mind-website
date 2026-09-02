@@ -28,6 +28,7 @@ import { cn } from "@/v2/lib/utils";
 import { cart } from "@/v2/lib/cart-store";
 import { toast } from "sonner";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
+import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { getPendingBooking, clearPendingBooking, consumeBookingResume } from "@/v2/lib/bookings";
 import {
   CONCERNS,
@@ -419,12 +420,27 @@ function ExpertsPage() {
     null,
   );
 
+  // Breakdown modal state for direct pack booking
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [breakdownData, setBreakdownData] = useState<{
+    itemName: string;
+    itemDescription: string;
+    basePrice: number;
+    planId: number;
+    psychologistId: number;
+    psychologistName: string;
+    dateStr: string;
+    timeStr: string;
+    packLabel: string;
+  } | null>(null);
+  const [submittingDirectBooking, setSubmittingDirectBooking] = useState(false);
+
   // Reopen the booking dialog when the visitor returns from login mid-booking
   useEffect(() => {
     if (consumeBookingResume()) setBookOpen(true);
   }, []);
 
-  const bookPack = async (
+  const bookPack = (
     p: Psychologist,
     pack: { id: string | number; label: string; price: number; billing: string },
   ) => {
@@ -433,67 +449,78 @@ function ExpertsPage() {
 
     if (pending && pending.slot1) {
       // Step 2 complete: preferred slots were ALREADY selected!
-      // Direct call to payForHappiTalk payment API with saved slot date & time
-      const token = auth.get()?.token;
       const planId = Number(pack.id) || 21;
       const amount = pack.price;
       const dateStr = pending.slot1.dateFormatted;
       const timeStr = pending.slot1.slot;
 
-      clearPendingBooking();
-
-      try {
-        const res = await payForHappiTalk(
-          {
-            psychologist_id: Number(p.id),
-            plan_id: planId,
-            amount,
-            date: dateStr,
-            time: timeStr,
-            session: 1,
-            user_recording_permission: 1,
-          },
-          token,
-        );
-
-        console.log("🌐 [Website API] Payment Link Response:", res);
-
-        if (res?.link) {
-          toast.success("Redirecting to secure payment gateway…");
-          window.location.href = res.link;
-          return;
-        } else {
-          toast.success(`Booking Confirmed for ${p.name}!`);
-        }
-      } catch (err: any) {
-        console.warn("Payment API notice:", err);
-        toast.error(err?.message ?? `Failed to initiate booking for ${p.name}`);
-      }
-
-      const orderId = "HM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-      const purchased = `HappiTALK - Session with ${p.name} (${pack.label})`;
-      const plan = `${pack.label} (${p.name})`;
-
-      cart.clear();
-      navigate({
-        to: "/checkout/success",
-        search: { orderId, purchased, plan, date: dateStr, slot: timeStr },
+      setBreakdownData({
+        itemName: `HappiTALK - Session with ${p.name} (${pack.label})`,
+        itemDescription: `Slot: ${dateStr} @ ${timeStr}`,
+        basePrice: amount,
+        planId,
+        psychologistId: Number(p.id),
+        psychologistName: p.name,
+        dateStr,
+        timeStr,
+        packLabel: pack.label,
       });
-    } else {
-      // No slots selected yet — open slot picker for this psychologist + selected pack
-      setBookingServiceContext({
-        key: "happitalk",
-        name: "HappiTALK",
-        initialPsychologist: p,
-        plan: {
-          id: String(pack.id),
-          name: pack.label,
-          price: pack.price,
-          billing: pack.billing,
+      setBreakdownOpen(true);
+      return;
+    }
+
+    // Step 1: Open booking dialog with full slot selection
+    setBookingServiceContext({
+      key: "happitalk",
+      name: "HappiTALK",
+      initialPsychologist: p,
+      plan: {
+        id: String(pack.id),
+        name: pack.label,
+        price: pack.price,
+        billing: pack.billing,
+      },
+      initialStep: "form",
+    });
+    setBookOpen(true);
+  };
+
+  const handleConfirmDirectBookingPayment = async (couponId?: number) => {
+    if (!breakdownData) return;
+    setSubmittingDirectBooking(true);
+    const token = auth.get()?.token;
+    clearPendingBooking();
+
+    try {
+      const res = await payForHappiTalk(
+        {
+          psychologist_id: breakdownData.psychologistId,
+          plan_id: breakdownData.planId,
+          amount: breakdownData.basePrice,
+          date: breakdownData.dateStr,
+          time: breakdownData.timeStr,
+          session: 1,
+          user_recording_permission: 1,
+          coupen_id: couponId ?? 0,
         },
-        initialStep: "form",
-      });
-      setBookOpen(true);
+        token,
+      );
+
+      console.log("🌐 [Website API] Payment Link Response:", res);
+
+      if (res?.link) {
+        toast.success("Redirecting to secure payment gateway…");
+        window.location.href = res.link;
+        return;
+      } else {
+        toast.success(`Booking Confirmed for ${breakdownData.psychologistName}!`);
+        setBreakdownOpen(false);
+      }
+    } catch (err: any) {
+      console.warn("Payment API notice:", err);
+      toast.error(err?.message ?? `Failed to initiate booking for ${breakdownData.psychologistName}`);
+    } finally {
+      setSubmittingDirectBooking(false);
     }
   };
 
@@ -976,6 +1003,19 @@ function ExpertsPage() {
         onOpenChange={setBookOpen}
         service={bookingServiceContext}
       />
+
+      {breakdownData && (
+        <PaymentBreakdownModal
+          open={breakdownOpen}
+          onOpenChange={setBreakdownOpen}
+          itemName={breakdownData.itemName}
+          itemDescription={breakdownData.itemDescription}
+          basePrice={breakdownData.basePrice}
+          planId={breakdownData.planId}
+          onConfirmPayment={handleConfirmDirectBookingPayment}
+          isLoading={submittingDirectBooking}
+        />
+      )}
     </DashboardShell>
   );
 }

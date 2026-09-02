@@ -15,6 +15,7 @@ import { cn } from "@/v2/lib/utils";
 import { cart } from "@/v2/lib/cart-store";
 import { toast } from "sonner";
 import { BookSessionDialog, type BookServiceContext } from "@/v2/components/book-session-dialog";
+import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
 import { consumeBookingResume } from "@/v2/lib/bookings";
 import { getCatalog } from "@/v2/data/service-catalog";
 import { payForBundle, fetchPackages, type Package } from "@/v2/lib/website-api";
@@ -535,6 +536,11 @@ const VALIDITY_MAP: Record<number, string> = {
   const [bookOpen, setBookOpen] = useState(false);
   const [bookingServiceContext, setBookingServiceContext] = useState<BookServiceContext | null>(null);
 
+  // Payment breakdown modal state
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [selectedPlanForBreakdown, setSelectedPlanForBreakdown] = useState<Plan | null>(null);
+  const [buyingPlanId, setBuyingPlanId] = useState<number | null>(null);
+
   // Reopen the booking dialog when the visitor returns from login mid-booking
   useEffect(() => {
     if (consumeBookingResume()) setBookOpen(true);
@@ -596,13 +602,22 @@ const VALIDITY_MAP: Record<number, string> = {
     };
   }, []);
 
-  const buyPlan = async (p: Plan) => {
+  const buyPlan = (p: Plan) => {
     if (!checkAuthOrRedirect(navigate, `/services/${slug}`, "Please log in to purchase a plan.")) {
       return;
     }
+    setSelectedPlanForBreakdown(p);
+    setBreakdownOpen(true);
+  };
+
+  const handleExecutePlanPayment = async (couponId?: number) => {
+    if (!selectedPlanForBreakdown) return;
+    const p = selectedPlanForBreakdown;
     const catalog = getCatalog(slug);
     const planId = p.planId ?? (parseInt(p.id, 10) || 12);
     const token = auth.get()?.token;
+
+    setBuyingPlanId(planId);
 
     try {
       // POST /api/v1/payment -> returns hosted Razorpay checkout link
@@ -610,7 +625,7 @@ const VALIDITY_MAP: Record<number, string> = {
         {
           plan_id: planId,
           amount: p.price,
-          coupen_id: 0,
+          coupen_id: couponId ?? 0,
         },
         token,
       );
@@ -623,22 +638,14 @@ const VALIDITY_MAP: Record<number, string> = {
         return;
       } else {
         toast.success(`Purchased ${p.name} plan!`);
+        setBreakdownOpen(false);
       }
     } catch (err: any) {
       console.warn("Bundle payment notice:", err);
       toast.error(err?.message ?? `Failed to initiate payment for ${p.name}`);
+    } finally {
+      setBuyingPlanId(null);
     }
-
-    const orderId = "HM-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    const serviceName = catalog?.name ? `HappiMynd - ${catalog.name}` : "HappiMynd Growth Plan";
-    const purchased = `${serviceName} - ${p.name}`;
-    const plan = p.name;
-
-    cart.clear();
-    navigate({
-      to: "/checkout/success",
-      search: { orderId, purchased, plan },
-    });
   };
 
   const buyIndividual = (name: string, key: string, price: number) => {
@@ -1222,6 +1229,19 @@ const VALIDITY_MAP: Record<number, string> = {
         onOpenChange={setBookOpen}
         service={bookingServiceContext}
       />
+
+      {selectedPlanForBreakdown && (
+        <PaymentBreakdownModal
+          open={breakdownOpen}
+          onOpenChange={setBreakdownOpen}
+          itemName={selectedPlanForBreakdown.name}
+          itemDescription={selectedPlanForBreakdown.value || `${selectedPlanForBreakdown.name} Plan`}
+          basePrice={selectedPlanForBreakdown.price}
+          planId={selectedPlanForBreakdown.planId ?? (parseInt(selectedPlanForBreakdown.id, 10) || 12)}
+          onConfirmPayment={handleExecutePlanPayment}
+          isLoading={buyingPlanId === (selectedPlanForBreakdown.planId ?? (parseInt(selectedPlanForBreakdown.id, 10) || 12))}
+        />
+      )}
     </DashboardShell>
   );
 }

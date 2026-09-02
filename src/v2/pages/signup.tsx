@@ -229,7 +229,7 @@ function SignupPage() {
         username: username.trim(),
         password,
         confirm_password: confirmPassword,
-        signup_type: category === "organization" || category === "school" ? "organisation" : "individual",
+        signup_type: category === "organization" || category === "school" ? "organization" : "individual",
         country_code: searchParams.country_code ?? "91",
         mobile: verifiedMobile || phoneMobile || searchParams.mobile || "",
         language: 1,
@@ -827,8 +827,7 @@ function CreateProfileStep(props: {
                 <option value="" disabled>Gender</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
-                <option value="non-binary">Non-binary</option>
-                <option value="prefer-not">Prefer not to say</option>
+                <option value="other">Other</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
