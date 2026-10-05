@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import whatSpaceHero from "@/assets/home-page-hero-group.jpg";
+import whatSpaceHero from "@/assets/home-page-hero-community.png";
 
 const trustPills = [{
   icon: Shield,

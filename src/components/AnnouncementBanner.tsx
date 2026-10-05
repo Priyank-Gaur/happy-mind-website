@@ -3,7 +3,21 @@ import { Link } from "react-router-dom";
 import solvLogo from "@/assets/solv-final-logo.png";
 import viewPlansMascot from "@/assets/view-plans-mascot.png";
 
-const AnnouncementBanner = () => {
+interface AnnouncementBannerProps {
+  title?: string;
+  description?: string;
+  priceNote?: string | null;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+const AnnouncementBanner = ({
+  title = "Find clarity. Build awareness. Grow consciously.",
+  description = "Whether you're navigating career pressure, relationships, overthinking or simply trying to understand yourself better, HappiMynd gives you the tools, guidance and expert support to move forward.",
+  priceNote = "Plans starting at ₹199",
+  ctaLabel = "Explore Plans",
+  ctaHref = "/v2/services/happiself",
+}: AnnouncementBannerProps) => {
   return (
     <div className="relative w-full overflow-hidden group cursor-pointer">
       {/* Animated lavender gradient background */}
@@ -38,17 +52,19 @@ const AnnouncementBanner = () => {
       <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
         {/* Main line */}
         <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
-          Find clarity. Build awareness. Grow consciously.
+          {title}
         </h1>
 
         {/* Supporting Text */}
         <div className="space-y-3 max-w-3xl">
           <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 text-center">
-            Whether you're navigating career pressure, relationships, overthinking or simply trying to understand yourself better, HappiMynd gives you the tools, guidance and expert support to move forward.
+            {description}
           </p>
-          <p className="font-sans text-xs md:text-sm lg:text-base font-semibold text-foreground text-center">
-            Plans starting at ₹199
-          </p>
+          {priceNote && (
+            <p className="font-sans text-xs md:text-sm lg:text-base font-semibold text-foreground text-center">
+              {priceNote}
+            </p>
+          )}
         </div>
 
         {/* CTA Button */}
@@ -57,8 +73,8 @@ const AnnouncementBanner = () => {
           variant="outline"
           className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
         >
-          <Link to="/v2/services/happiself">
-            Explore Plans
+          <Link to={ctaHref}>
+            {ctaLabel}
           </Link>
         </Button>
       </div>

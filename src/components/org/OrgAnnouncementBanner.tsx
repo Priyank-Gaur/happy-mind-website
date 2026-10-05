@@ -43,9 +43,9 @@ const OrgAnnouncementBanner = () => {
         {/* Supporting Text */}
         <div className="space-y-3 max-w-3xl">
           <h2 className="font-serif text-base md:text-lg lg:text-xl font-medium text-foreground text-center">
-            October 10, World Mental Health Day is a reminder to orient towards holistic well being.
+            This World Mental Health Day is a reminder to orient towards holistic well being.
           </h2>
-          <p className="font-sans text-xs md:text-sm lg:text-base font-semibold text-foreground text-center">
+          <p className="font-sans text-base md:text-lg lg:text-xl font-semibold text-foreground text-center">
             Let us drive awareness &amp; acceptance!!
           </p>
           <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 text-center">

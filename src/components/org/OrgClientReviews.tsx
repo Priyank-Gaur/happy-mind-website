@@ -6,21 +6,25 @@ const reviews = [
     quote: "Thanks to Happimynd, our organization has made significant strides in destigmatizing mental health in the workplace. The platform's emphasis on self-care and emotional well-being has sparked meaningful conversations around mental health, ultimately fostering a more supportive and compassionate work environment for all.",
     author: "Suresh",
     company: "AnantRaj",
+    designation: "Senior HR Manager",
   },
   {
     quote: "With Happimynd, our team has been able to proactively address mental health concerns and provide timely support to employees in need. The platform's confidential counseling services and self-assessment tools have facilitated early intervention, preventing potential burnout and promoting long-term well-being.",
     author: "Anuj Nath",
     company: "Signature Global",
+    designation: "Chief Human Resource Officer",
   },
   {
     quote: "Since Oct 2022, we are partnered with HappiMynd and happy to say that we took the benefits of what are there in the tools of happimynd; our employees are well aware now of its features and taking benefits. Mental and physical, both tests are now in need of the hour, management reports help us see where to address employees, while individual reports confidentiality is strictly adhered to.",
     author: "Naresh Gehlot",
     company: "Nuvoco",
+    designation: "General Manager",
   },
   {
     quote: "HappiMynd's results-oriented approach is commendable. Their 30+ successful partnerships with leading Indian corporations speak volumes about their effectiveness. If you are an organization seeking to invest in your employees' mental and emotional well-being, look no further than HappiMynd. Their PHYGITAL platform offers a powerful and unique solution that will yield positive and long-lasting results",
     author: "Rohan Chopra",
     company: "M3M India",
+    designation: "Head of Human Resource",
   }
 ];
 
@@ -60,6 +64,7 @@ const OrgClientReviews = () => {
                 <div className="border-t border-border/30 pt-4 flex-shrink-0">
                   <p className="font-semibold text-foreground">{review.author}</p>
                   <p className="text-sm text-muted-foreground">{review.company}</p>
+                  <p className="text-xs text-muted-foreground/80 mt-0.5">{review.designation}</p>
                 </div>
               </motion.div>
             ))}
