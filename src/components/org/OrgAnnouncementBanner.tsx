@@ -1,23 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import solvLogo from "@/assets/solv-final-logo.png";
 import viewPlansMascot from "@/assets/view-plans-mascot.png";
 
-interface AnnouncementBannerProps {
-  title?: string;
-  description?: string;
-  priceNote?: string | null;
-  ctaLabel?: string;
-  ctaHref?: string;
-}
-
-const AnnouncementBanner = ({
-  title = "Find clarity. Build awareness. Grow consciously.",
-  description = "Whether you're navigating career pressure, relationships, overthinking or simply trying to understand yourself better, HappiMynd gives you the tools, guidance and expert support to move forward.",
-  priceNote = "Plans starting at ₹199",
-  ctaLabel = "Explore Plans",
-  ctaHref = "/v2/services/happiself",
-}: AnnouncementBannerProps) => {
+const OrgAnnouncementBanner = () => {
   return (
     <div className="relative w-full overflow-hidden group cursor-pointer">
       {/* Animated lavender gradient background */}
@@ -52,19 +37,20 @@ const AnnouncementBanner = ({
       <div className="relative z-10 container mx-auto px-6 lg:px-16 py-4 md:py-6 lg:py-8 flex flex-col items-center justify-center text-center">
         {/* Main line */}
         <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-2 md:mb-3">
-          {title}
+          MIND MATTERS - An Awareness Initiative.
         </h1>
 
         {/* Supporting Text */}
         <div className="space-y-3 max-w-3xl">
-          <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 text-center">
-            {description}
+          <h2 className="font-serif text-base md:text-lg lg:text-xl font-medium text-foreground text-center">
+            This World Mental Health Day is a reminder to orient towards holistic well being.
+          </h2>
+          <p className="font-sans text-base md:text-lg lg:text-xl font-semibold text-foreground text-center">
+            Let us drive awareness &amp; acceptance!!
           </p>
-          {priceNote && (
-            <p className="font-sans text-xs md:text-sm lg:text-base font-semibold text-foreground text-center">
-              {priceNote}
-            </p>
-          )}
+          <p className="font-sans text-sm md:text-base lg:text-lg text-foreground/80 text-center">
+            Go beyond a one-day message with fun, learn and self reflect experience organized to help your people gain clarity and take something valuable away.
+          </p>
         </div>
 
         {/* CTA Button */}
@@ -73,8 +59,14 @@ const AnnouncementBanner = ({
           variant="outline"
           className="mt-6 bg-card text-foreground rounded-full px-8 py-2.5 font-medium shadow-sm hover:bg-card hover:text-foreground hover:shadow-sm flex items-center gap-2"
         >
-          <Link to={ctaHref}>
-            {ctaLabel}
+          <Link
+            to="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.dispatchEvent(new CustomEvent('open-contact-form'));
+            }}
+          >
+            Connect With Us
           </Link>
         </Button>
       </div>
@@ -82,4 +74,4 @@ const AnnouncementBanner = ({
   );
 };
 
-export default AnnouncementBanner;
+export default OrgAnnouncementBanner;

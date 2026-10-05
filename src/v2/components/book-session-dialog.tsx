@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format, isSameDay } from "date-fns";
 import { useV2Navigate } from "@/v2/lib/router";
 import { Calendar as CalendarIcon, Clock, CircleCheck, LoaderCircle, Sparkles, ArrowRight, UserCheck } from "lucide-react";
@@ -164,21 +164,32 @@ export function BookSessionDialog({
   const { authed } = useAuth();
   const [isConfirmingPreAuth, setIsConfirmingPreAuth] = useState(false);
 
-  // Reset/sync dialog state whenever opened
+  // Always read the latest `service`/`authed` without making them effect
+  // dependencies — several callers pass an inline object literal, so its
+  // identity changes on every parent render.
+  const serviceRef = useRef(service);
+  serviceRef.current = service;
+  const authedRef = useRef(authed);
+  authedRef.current = authed;
+  const wasOpenRef = useRef(false);
+
+  // Reset/sync dialog state only on the closed → open transition. Resetting on
+  // every render of the parent would wipe the slots the user is filling in.
   useEffect(() => {
-    if (open) {
-      setStep(service?.initialStep || "form");
+    if (open && !wasOpenRef.current) {
+      const svc = serviceRef.current;
+      setStep(svc?.initialStep || "form");
       const pending = getPendingBooking();
       const currentUser = auth.get();
-      const isAuthed = Boolean(currentUser?.token || authed);
+      const isAuthed = Boolean(currentUser?.token || authedRef.current);
       const isPreAuth = Boolean(pending?.filledOutsideLogin && isAuthed);
       setIsConfirmingPreAuth(isPreAuth);
 
       // Prioritize restored slots from pending booking storage
-      const restoredDate1 = pending?.slot1?.date || service?.initialSlots?.slot1?.date;
-      const restoredSlot1 = pending?.slot1?.slot || service?.initialSlots?.slot1?.slot || "";
-      const restoredDate2 = pending?.slot2?.date || service?.initialSlots?.slot2?.date;
-      const restoredSlot2 = pending?.slot2?.slot || service?.initialSlots?.slot2?.slot || "";
+      const restoredDate1 = pending?.slot1?.date || svc?.initialSlots?.slot1?.date;
+      const restoredSlot1 = pending?.slot1?.slot || svc?.initialSlots?.slot1?.slot || "";
+      const restoredDate2 = pending?.slot2?.date || svc?.initialSlots?.slot2?.date;
+      const restoredSlot2 = pending?.slot2?.slot || svc?.initialSlots?.slot2?.slot || "";
 
       setDate1(restoredDate1);
       setSlot1(restoredSlot1);
@@ -192,13 +203,14 @@ export function BookSessionDialog({
       const initialKey =
         pending?.serviceKey
           ? (pending.serviceKey.toLowerCase() === "happitalk" ? "happitalk" : "solv")
-          : service?.key?.toLowerCase() === "happitalk"
+          : svc?.key?.toLowerCase() === "happitalk"
             ? "happitalk"
             : "solv";
       setSelectedServiceKey(initialKey);
-      setSelectedPsychologist(service?.initialPsychologist || null);
+      setSelectedPsychologist(svc?.initialPsychologist || null);
     }
-  }, [open, service, authed]);
+    wasOpenRef.current = open;
+  }, [open]);
 
   const isHappiTalk = selectedServiceKey === "happitalk";
   const solvName = isOrgUser ? "HappiGUIDE" : "SOLV";
@@ -747,11 +759,10 @@ export function BookSessionDialog({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-foreground">
-                  Booking Confirmed!
+                  Slots Noted!
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground max-w-md leading-relaxed">
-                  Thank you <span className="font-semibold text-foreground">{profile.name}</span>! Your 2 preferred date/time slots for <span className="font-semibold text-foreground">{activeService.name}</span>
-                  {selectedPsychologist ? ` with ${selectedPsychologist.name}` : ""} have been successfully confirmed.
+                  Thank you <span className="font-semibold text-foreground">{profile.name}</span>! Your 2 slots are noted and the team will reach you soon for confirmation.
                 </p>
 
                 <div className="mt-4 rounded-2xl bg-lavender/15 p-4 text-left space-y-2 text-xs">

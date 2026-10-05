@@ -10,6 +10,9 @@ import solvLogo from "@/assets/solv-final-logo.png";
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.happimynd";
 
+/** Module-level so its identity stays stable across renders of the navbar. */
+const SOLV_BOOKING_CONTEXT = { key: "solv", name: "SOLV" };
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -193,7 +196,7 @@ const Navbar = () => {
       <BookSessionDialog
         open={bookingOpen}
         onOpenChange={setBookingOpen}
-        service={{ key: "solv", name: "SOLV" }}
+        service={SOLV_BOOKING_CONTEXT}
       />
     </nav>
   );

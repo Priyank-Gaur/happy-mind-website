@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, User } from "lucide-react";
-import { fetchPsychologists } from "@/v2/lib/website-api";
+import { fetchPsychologists, type ApiPsychologist } from "@/v2/lib/website-api";
 import amitRathiImage from "@/assets/team/1630081769-amit_rathi.png";
 import raviKantImage from "@/assets/team/1630082349-ravi_kant.png";
 import neerajTripathiImage from "@/assets/team/1630092178-neeraj_tripathi.png";
@@ -100,35 +100,35 @@ const growthCoaches: GrowthCoach[] = [
     name: "Amit Rathi",
     role: "Leadership & Executive Coach",
     description:
-      "Executive & Leadership Coaching | Enterprise Thinking | Conscious Growth Development | Role Transition Expert | Corporate Training | Emotional Intelligence",
+      "ICF Certified | Executive & Leadership Coaching | Enterprise Thinking | Conscious Growth Development | Role Transition Expert | Corporate Training | Emotional Intelligence",
     image: amitRathiImage,
   },
   {
     name: "Jaya Azad",
     role: "Strategic HR & Leadership Coach",
     description:
-      "Strategic HR Leadership | HR Transformation | Organization Design | Talent & Culture Strategy",
+      "ICF Certified | Strategic HR Leadership | HR Transformation | Organization Design | Talent & Culture Strategy",
     image: jayaAzadImage,
   },
   {
     name: "Nidhi Sharma",
     role: "Emotional Intelligence & Executive Coach",
     description:
-      "Executive Coaching | Extensive Industry Exposure | Group Coaching | Behavioral Support Program | Holistic Fitness Counselling",
+      "ICF Certified | Executive Coaching | Extensive Industry Exposure | Group Coaching | Behavioral Support Program | Holistic Fitness Counselling",
     image: nidhiSharmaImage,
   },
   {
     name: "Sangeeta Janardhan",
     role: "Executive & Leadership Coach",
     description:
-      "Executive & Leadership Coach | Mentor Coach | Mindfulness Practitioner",
+      "ICF Certified | Executive & Leadership Coach | Mentor Coach | Mindfulness Practitioner",
     image: sangeetaJanardhanImage,
   },
   {
     name: "Indu Ananth",
     role: "Career & Executive Coach",
     description:
-      "Career Development Coaching | Executive Coaching | Life Coaching | Leadership Development",
+      "ICF Certified | Career Development Coaching | Executive Coaching | Life Coaching | Leadership Development",
     image: induAnanthImage,
   },
   {
@@ -142,14 +142,14 @@ const growthCoaches: GrowthCoach[] = [
     name: "Sanjeev Bhatia",
     role: "Leadership & Executive Coach",
     description:
-      "Executive Coaching | Career Development Coaching | Change Management | Corporate Training | Leadership Development",
+      "ICF Certified | Executive Coaching | Career Development Coaching | Change Management | Corporate Training | Leadership Development",
     image: sanjeevBhatiaImage,
   },
   {
     name: "Anumeha Sinha",
     role: "Leadership Development Coach",
     description:
-      "Professional Development | Performance Enhancement | Leadership Development | Change Management | Team Building | Conflict Resolution | Culture Building",
+      "ICF Certified | Professional Development | Performance Enhancement | Leadership Development | Change Management | Team Building | Conflict Resolution | Culture Building",
     image: anumehaSinhaImage,
   },
 ];
@@ -213,6 +213,50 @@ const leadingPsychologists: GrowthCoach[] = [
     description:
       "Trauma & Anxiety | Relationships | Emotional & Behavioural Issues",
     image: vidyalakshmiImage,
+  },
+  // Names below match `expertRoster` exactly so `buildExperts` drops them from
+  // the "See More" grid. Photo + specialities come from the live directory.
+  {
+    name: "Dr. Satnam Singh Deol",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Sanika Dharaskar",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Kiran Makhijani",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Sakshi Jain",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Dr. Tazveen Shaikh",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Dr. Pratibha Sharma",
+    role: "Clinical Psychologist",
+    description: "",
+  },
+  {
+    name: "Priyanshi Garg",
+    role: "Clinical Psychologist",
+    description: "",
+    image: priyanshiGargImage,
+  },
+  {
+    name: "Shraddha Yadav",
+    role: "Counselling Psychologist",
+    description: "",
+    image: shraddhaYadavImage,
   },
 ];
 
@@ -339,30 +383,50 @@ const namesLooselyMatch = (a: string, b: string) => {
   return wordsA[0] === wordsB[0] && lastMatches;
 };
 
+/** "Anxiety | Depression | Trauma" from the directory's specialization field. */
+const formatSpecialities = (specialization: ApiPsychologist["specialization"]) => {
+  if (!specialization) return "";
+  const names = Array.isArray(specialization)
+    ? specialization.map((s) => (typeof s === "string" ? s : s?.name)).filter(Boolean)
+    : [specialization];
+  return (names as string[]).slice(0, 3).join(" | ");
+};
+
 const AboutTeamSection = () => {
   const [showExperts, setShowExperts] = useState(false);
-  const [expertPhotos, setExpertPhotos] = useState<{ name: string; url: string }[]>([]);
+  const [directory, setDirectory] = useState<
+    { name: string; url?: string; specialities: string }[]
+  >([]);
   const hasFetchedPhotos = useRef(false);
 
+  // Fetched on mount (not only when "See More" opens) because the Leading
+  // Psychologists cards above the fold also rely on it for photos/specialities.
   useEffect(() => {
-    if (!showExperts || hasFetchedPhotos.current) return;
+    if (hasFetchedPhotos.current) return;
     hasFetchedPhotos.current = true;
 
     fetchPsychologists({ limit: 100 })
       .then(({ psychologists }) => {
-        setExpertPhotos(
+        setDirectory(
           psychologists
-            .filter((p) => p.full_name && p.profile_picture_url)
-            .map((p) => ({ name: p.full_name, url: p.profile_picture_url as string }))
+            .filter((p) => p.full_name)
+            .map((p) => ({
+              name: p.full_name,
+              url: p.profile_picture_url ?? undefined,
+              specialities: formatSpecialities(p.specialization),
+            }))
         );
       })
       .catch(() => {
         // Directory unreachable — cards keep their placeholder icon.
       });
-  }, [showExperts]);
+  }, []);
+
+  const findInDirectory = (name: string) =>
+    directory.find((p) => namesLooselyMatch(name, p.name));
 
   const resolveExpertImage = (expert: Expert) =>
-    expert.image ?? expertPhotos.find((p) => namesLooselyMatch(expert.name, p.name))?.url;
+    expert.image ?? findInDirectory(expert.name)?.url;
 
   return (
     <section id="our-team" className="py-24 px-6 lg:px-16">
@@ -498,44 +562,54 @@ const AboutTeamSection = () => {
           <span className="mt-3 block h-0.5 w-16 mx-auto rounded-full bg-primary/40" />
         </div>
 
-        {/* 9 Leading Psychologists: 2 rows of 4, last one centered */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 max-w-5xl mx-auto">
-          {leadingPsychologists.map((psychologist, index) => (
-            <div
-              key={index}
-              className={`text-center group${
-                index === leadingPsychologists.length - 1
-                  ? " sm:col-span-2 md:col-span-4 mx-auto w-full max-w-[11rem]"
-                  : ""
-              }`}
-            >
-              {/* Photo Container */}
-              <div className="relative mb-4 mx-auto w-28 h-28 md:w-36 md:h-36">
-                <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/30 transition-all duration-300 shadow-sm bg-primary/5 flex items-center justify-center">
-                  {psychologist.image ? (
-                    <img
-                      src={psychologist.image}
-                      alt={psychologist.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-1/2 h-1/2 text-primary/30" strokeWidth={1.5} />
-                  )}
-                </div>
-              </div>
+        {/* Leading Psychologists: rows of 4, trailing row centered */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 max-w-5xl mx-auto justify-items-center">
+          {leadingPsychologists.map((psychologist, index) => {
+            const listed = findInDirectory(psychologist.name);
+            const photo = psychologist.image ?? listed?.url;
+            const specialities = psychologist.description || listed?.specialities || "";
+            // A single leftover card on the final row gets centered instead of
+            // hanging off the left edge.
+            const isLoneLastCard =
+              index === leadingPsychologists.length - 1 && leadingPsychologists.length % 4 === 1;
 
-              {/* Info */}
-              <h3 className="font-serif text-base md:text-lg font-semibold text-foreground mb-1">
-                {psychologist.name}
-              </h3>
-              <p className="text-primary text-xs md:text-sm font-medium mb-1.5">
-                {psychologist.role}
-              </p>
-              <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                {psychologist.description}
-              </p>
-            </div>
-          ))}
+            return (
+              <div
+                key={index}
+                className={`text-center group w-full max-w-[11rem]${
+                  isLoneLastCard ? " sm:col-span-2 md:col-span-4 mx-auto" : ""
+                }`}
+              >
+                {/* Photo Container */}
+                <div className="relative mb-4 mx-auto w-28 h-28 md:w-36 md:h-36">
+                  <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/30 transition-all duration-300 shadow-sm bg-primary/5 flex items-center justify-center">
+                    {photo ? (
+                      <img
+                        src={photo}
+                        alt={psychologist.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-1/2 h-1/2 text-primary/30" strokeWidth={1.5} />
+                    )}
+                  </div>
+                </div>
+
+                {/* Info */}
+                <h3 className="font-serif text-base md:text-lg font-semibold text-foreground mb-1">
+                  {psychologist.name}
+                </h3>
+                <p className="text-primary text-xs md:text-sm font-medium mb-1.5">
+                  {psychologist.role}
+                </p>
+                {specialities && (
+                  <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
+                    {specialities}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* See More / See Less toggle */}

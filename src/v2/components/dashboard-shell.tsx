@@ -27,16 +27,39 @@ type NavItem = {
   label: string;
   key: string;
   to?: string;
+  /** Marks a newly launched platform - renders the eye-catching NEW badge. */
+  isNew?: boolean;
 };
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", key: "dashboard", to: "/" },
   { icon: ClipboardCheck, label: "Self Check In", key: "assessment", to: "/assessment" },
-  { icon: Puzzle, label: "Quizzard", key: "quizzard", to: "/quizzard" },
+  { icon: Puzzle, label: "Quizzard", key: "quizzard", to: "/quizzard", isNew: true },
   { icon: BookOpen, label: "Resources", key: "resources", to: "/resources" },
   { icon: Sparkles, label: "Services", key: "services", to: "/services" },
-  { icon: Gamepad2, label: "Games", key: "games", to: "/games" },
+  { icon: Gamepad2, label: "Games", key: "games", to: "/games", isNew: true },
 ];
+
+/** Pill badge for newly launched sections. */
+const NewBadge = () => (
+  <span className="ml-auto relative inline-flex shrink-0 items-center gap-1 overflow-hidden rounded-full bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#EC4899] px-2 py-[3px] text-[9px] font-extrabold uppercase leading-none tracking-[0.08em] text-white ring-1 ring-white/40 animate-badge-glow">
+    <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
+    New
+    {/* shine sweep */}
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-y-0 -left-4 w-6 bg-white/50 blur-[2px] animate-badge-shine"
+    />
+  </span>
+);
+
+/** Dot marker used when the label is hidden (collapsed rail / mobile bar). */
+const NewDot = () => (
+  <span className="absolute right-1.5 top-1.5 flex h-2.5 w-2.5">
+    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#EC4899] opacity-75" />
+    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-r from-[#7C3AED] to-[#EC4899] ring-2 ring-white" />
+  </span>
+);
 
 /** Status shown in the header pill. */
 export type HeaderStatus = "active" | "pending" | "not_given";
@@ -180,18 +203,23 @@ export function DashboardShell({ header, children }: { header?: ReactNode; child
                   ? "bg-gradient-brand text-white shadow-glow"
                   : "text-muted-foreground hover:bg-lavender/20 hover:text-foreground"
               }`;
+              const inner = (
+                <>
+                  <Icon className="h-5 w-5 shrink-0" strokeWidth={2} />
+                  {expanded && <span className="whitespace-nowrap">{item.label}</span>}
+                  {item.isNew && (expanded ? <NewBadge /> : <NewDot />)}
+                </>
+              );
               if (item.to) {
                 return (
-                  <V2Link key={item.key} to={item.to} className={cls} aria-label={item.label}>
-                    <Icon className="h-5 w-5 shrink-0" strokeWidth={2} />
-                    {expanded && <span className="whitespace-nowrap">{item.label}</span>}
+                  <V2Link key={item.key} to={item.to} className={cls} aria-label={item.isNew ? `${item.label} (new)` : item.label}>
+                    {inner}
                   </V2Link>
                 );
               }
               return (
-                <button key={item.key} className={cls} aria-label={item.label}>
-                  <Icon className="h-5 w-5 shrink-0" strokeWidth={2} />
-                  {expanded && <span className="whitespace-nowrap">{item.label}</span>}
+                <button key={item.key} className={cls} aria-label={item.isNew ? `${item.label} (new)` : item.label}>
+                  {inner}
                 </button>
               );
             })}
@@ -483,19 +511,25 @@ function MobileNav({ pathname }: { pathname: string }) {
       {items.map((it) => {
         const Icon = it.icon;
         const active = it.to ? pathname === v2Url(it.to) : false;
-        const cls = `grid h-12 w-12 place-items-center rounded-2xl transition ${
+        const cls = `relative grid h-12 w-12 place-items-center rounded-2xl transition ${
           active ? "bg-gradient-brand text-white shadow-glow" : "text-muted-foreground"
         }`;
+        const inner = (
+          <>
+            <Icon className="h-5 w-5" strokeWidth={2} />
+            {it.isNew && <NewDot />}
+          </>
+        );
         if (it.to) {
           return (
-            <V2Link key={it.key} to={it.to} className={cls} aria-label={it.label}>
-              <Icon className="h-5 w-5" strokeWidth={2} />
+            <V2Link key={it.key} to={it.to} className={cls} aria-label={it.isNew ? `${it.label} (new)` : it.label}>
+              {inner}
             </V2Link>
           );
         }
         return (
-          <button key={it.key} className={cls} aria-label={it.label}>
-            <Icon className="h-5 w-5" strokeWidth={2} />
+          <button key={it.key} className={cls} aria-label={it.isNew ? `${it.label} (new)` : it.label}>
+            {inner}
           </button>
         );
       })}

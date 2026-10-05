@@ -19,6 +19,22 @@ import { toast } from "sonner";
 
 export default SubscriptionPage;
 
+/** Platforms every member gets by default - shown alongside the API's subscribed plans. */
+const DEFAULT_PLATFORMS = [
+  {
+    key: "quizzard",
+    name: "Quizzard",
+    description: "25+ quizzes and instant insights into how you think and feel.",
+    to: "/quizzard",
+  },
+  {
+    key: "games",
+    name: "Games",
+    description: "Mind games that turn daily practice into something you look forward to.",
+    to: "/games",
+  },
+] as const;
+
 import { useProtectedRoute, checkAuthOrRedirect } from "@/v2/lib/auth-guard";
 
 import { PaymentBreakdownModal } from "@/v2/components/payment-breakdown-modal";
@@ -161,26 +177,56 @@ function SubscriptionPage() {
                 <LoaderCircle className="h-5 w-5 animate-spin text-lavender-deep" />
                 <span className="text-sm">Loading active plans…</span>
               </div>
-            ) : activeSubscribedPackages.length > 0 ? (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                {activeSubscribedPackages.map((pkg) => (
-                  <div key={pkg.id} className="rounded-2xl bg-white/80 p-4 shadow-soft">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-foreground">{pkg.name}</h4>
-                      <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase text-emerald-700">
-                        Active
-                      </span>
-                    </div>
-                    {pkg.description && (
-                      <p className="mt-1 text-xs text-muted-foreground">{pkg.description}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
             ) : (
-              <div className="mt-6 text-sm text-muted-foreground">
-                No active plans found. Choose a plan below to start your growth journey.
-              </div>
+              <>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {activeSubscribedPackages.map((pkg) => (
+                    <div key={pkg.id} className="rounded-2xl bg-white/80 p-4 shadow-soft">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-foreground">{pkg.name}</h4>
+                        <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase text-emerald-700">
+                          Active
+                        </span>
+                      </div>
+                      {pkg.description && (
+                        <p className="mt-1 text-xs text-muted-foreground">{pkg.description}</p>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Quizzard & Games ship with every membership - always shown */}
+                  {DEFAULT_PLATFORMS.map((platform) => (
+                    <V2Link
+                      key={platform.key}
+                      to={platform.to}
+                      className="group rounded-2xl bg-white/80 p-4 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-card"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-bold text-foreground">{platform.name}</h4>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <span className="rounded-full bg-gradient-brand px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-glow">
+                            New
+                          </span>
+                          <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase text-emerald-700">
+                            Active
+                          </span>
+                        </div>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{platform.description}</p>
+                      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-lavender-deep">
+                        Open {platform.name}
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </V2Link>
+                  ))}
+                </div>
+
+                {activeSubscribedPackages.length === 0 && (
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    No paid plans active yet. Choose a plan below to start your growth journey.
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>

@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import SolvHeroSection from "@/components/solv/SolvHeroSection";
 import SolvImpactStats from "@/components/solv/SolvImpactStats";
 import SolvRealityCheck from "@/components/solv/SolvRealityCheck";
@@ -13,7 +14,17 @@ const Solv = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-16">
+      <main className="pt-16 lg:pt-20">
+        {/* Announcement Banner */}
+        <div>
+          <AnnouncementBanner
+            title="Talk It Through. Grow Consciously."
+            description="Stuck in a decision, caught in a pattern, or simply need a clearer perspective? Connect with an expert for a focused 1:1 conversation with SOLV."
+            priceNote={null}
+            ctaHref="/v2/services/solv"
+          />
+        </div>
+
         {/* 1. Hero */}
         <div className="surface-hero">
           <SolvHeroSection />

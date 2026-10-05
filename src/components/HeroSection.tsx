@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import whatSpaceHero from "@/assets/home-page-hero-section.png";
+import whatSpaceHero from "@/assets/home-page-hero-community.png";
 
 const trustPills = [{
   icon: Shield,
@@ -18,22 +18,26 @@ const HeroSection = () => {
   return (
     <section className="min-h-[110vh] relative overflow-hidden">
       
-      {/* Background Image */}
+      {/* Background Image - anchored right so the group stays clear of the copy */}
       <div className="absolute inset-0">
-        <img 
-          src={whatSpaceHero} 
-          alt="" 
-          className="w-full h-full object-cover"
+        <img
+          src={whatSpaceHero}
+          alt=""
+          className="w-full h-full object-cover object-[68%_center] lg:object-[78%_center]"
         />
       </div>
 
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 z-10 pointer-events-none" style={{
-        background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 35%, hsl(var(--background) / 0.7) 55%, transparent 75%)"
+      {/* Mobile/tablet: soft veil across the whole image so centred copy stays readable */}
+      <div className="absolute inset-0 z-10 pointer-events-none bg-background/80 lg:hidden" />
+
+      {/* Desktop: left-to-right scrim that clears the text column */}
+      <div className="absolute inset-0 z-10 pointer-events-none hidden lg:block" style={{
+        background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 32%, hsl(var(--background) / 0.9) 44%, hsl(var(--background) / 0.6) 56%, hsl(var(--background) / 0.2) 70%, transparent 82%)"
       }} />
+
       {/* Top/bottom fade */}
       <div className="absolute inset-0 z-10 pointer-events-none" style={{
-        background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 15%, transparent 85%, hsl(var(--background)) 100%)"
+        background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.35) 12%, transparent 28%, transparent 78%, hsl(var(--background) / 0.6) 92%, hsl(var(--background)) 100%)"
       }} />
 
       {/* Content */}

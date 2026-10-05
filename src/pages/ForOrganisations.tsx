@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import OrgAnnouncementBanner from "@/components/org/OrgAnnouncementBanner";
 import OrgHeroSection from "@/components/org/OrgHeroSection";
 import OrgScrollingBanner from "@/components/org/OrgScrollingBanner";
 import OrgBusinessRealityStrip from "@/components/org/OrgBusinessRealityStrip";
@@ -17,6 +18,9 @@ const ForOrganisations = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20">
+        <div>
+          <OrgAnnouncementBanner />
+        </div>
         <div className="surface-hero">
           <OrgHeroSection />
         </div>

@@ -5,6 +5,9 @@ import { Menu, X } from "lucide-react";
 import { BookSessionDialog } from "@/v2/components/book-session-dialog";
 import { consumeBookingResume } from "@/v2/lib/bookings";
 
+/** Module-level so its identity stays stable across renders of the navbar. */
+const SOLV_BOOKING_CONTEXT = { key: "solv", name: "SOLV" };
+
 const SolvNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -112,7 +115,7 @@ const SolvNavbar = () => {
       <BookSessionDialog
         open={bookingOpen}
         onOpenChange={setBookingOpen}
-        service={{ key: "solv", name: "SOLV" }}
+        service={SOLV_BOOKING_CONTEXT}
       />
     </nav>
   );

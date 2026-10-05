@@ -185,6 +185,22 @@ export default {
 				'100%': {
 					transform: 'translateX(-100%)'
 				}
+			},
+			'badge-shine': {
+				'0%': {
+					transform: 'translateX(-140%) skewX(-20deg)'
+				},
+				'55%, 100%': {
+					transform: 'translateX(240%) skewX(-20deg)'
+				}
+			},
+			'badge-glow': {
+				'0%, 100%': {
+					boxShadow: '0 0 0 0 hsl(280 85% 60% / 0.4)'
+				},
+				'50%': {
+					boxShadow: '0 0 12px 2px hsl(320 85% 62% / 0.55)'
+				}
 			}
 		},
 		animation: {
@@ -198,7 +214,9 @@ export default {
 			'mist-right': 'mist-right 6s ease-in-out infinite',
 			'mist-right-slow': 'mist-right-slow 10s ease-in-out infinite',
 			'mist-pulse': 'mist-pulse 4s ease-in-out infinite',
-			'scroll-left': 'scroll-left 20s linear infinite'
+			'scroll-left': 'scroll-left 20s linear infinite',
+			'badge-shine': 'badge-shine 2.8s ease-in-out infinite',
+			'badge-glow': 'badge-glow 2.4s ease-in-out infinite'
 		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',
